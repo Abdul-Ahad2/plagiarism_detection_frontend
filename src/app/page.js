@@ -45,7 +45,7 @@ export default function Home() {
             <button
               className={`${dmSans_light.className} mt-6 md:mt-8 px-8 py-6 md:px-10 md:py-8 text-[#044343] bg-[#E4E4E4] text-lg md:text-xl border-black border-b-4 md:border-b-8 border-l-4 md:border-l-8 border-r-2 border-t-2 hover:scale-105 transition-transform`}
             >
-              Sign Up - It's Free
+              Sign Up - It&apos;s Free
             </button>
           </div>
         </div>
