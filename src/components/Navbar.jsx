@@ -18,13 +18,19 @@ export default function Navbar() {
       <div
         className={`${dmSans.className} w-full bg-[#E4E4E4] h-[13vh] text-[#045757]`}
       >
-        <div className="flex justify-between items-center h-full px-7">
+        {/* Mobile & Tablet View - Only Logo */}
+        <div className="md:hidden flex items-center justify-center h-full">
+          <div className={`${bs.className} text-4xl font-bold`}>SleuthInk.</div>
+        </div>
+
+        {/* Desktop View - Full Navigation */}
+        <div className="hidden md:flex justify-between items-center h-full px-7">
           <div className="flex items-center space-x-6">
             <div className={`${bs.className} text-4xl font-bold`}>
               SleuthInk.
             </div>
             <div>Why SleuthInk</div>
-            <div> How It Works</div>
+            <div>How It Works</div>
             <div>Detection Methods</div>
             <div>Privacy & Ethics</div>
           </div>
