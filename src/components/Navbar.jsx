@@ -29,17 +29,17 @@ export default function Navbar() {
             <div className={`${bs.className} text-4xl font-bold`}>
               SleuthInk.
             </div>
-            <div>Why SleuthInk</div>
-            <div>How It Works</div>
-            <div>Detection Methods</div>
-            <div>Privacy & Ethics</div>
+            <a href="/#why-choose">Why SleuthInk</a>
+            <a href="/#how-it-works">How It Works</a>
+            <a href="/#detection-methods">Detection Methods</a>
+            <a href="/#privacy">Privacy & Ethics</a>
           </div>
           <div>
-            <ul className="flex space-x-6">
-              <li>Support</li>
-              <li>Contact</li>
-              <li>Log In</li>
-            </ul>
+            <div className="flex space-x-6">
+              <div>Support</div>
+              <div>Contact</div>
+              <Link href={"/login"}>Log In</Link>
+            </div>
           </div>
         </div>
       </div>
