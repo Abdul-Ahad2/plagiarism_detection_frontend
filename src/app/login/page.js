@@ -78,7 +78,7 @@ export default function Login() {
             <div>Signin with Google</div>
           </button>
           <p className="text-center">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link href={"/register"} className="text-[#044343] underline">
               Create Account
             </Link>
