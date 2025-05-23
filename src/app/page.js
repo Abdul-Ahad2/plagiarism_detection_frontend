@@ -30,8 +30,8 @@ const RotatingBox = ({ children, className = "" }) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
     const y = (e.clientY - rect.top) / rect.height;
-    const rotateY = (x - 0.5) * 10; // Reduced from 20 to 10 for subtler effect
-    const rotateX = (0.5 - y) * 10;
+    const rotateY = (x - 0.5) * 25;
+    const rotateX = (0.5 - y) * 25;
     setRotation({ x: rotateX, y: rotateY });
   };
 
@@ -104,21 +104,32 @@ export default function Home() {
         <div className="w-full lg:w-1/2 flex items-center p-8 md:p-12 lg:p-24 ">
           <div className="text-[#044343]">
             <h1
-              className={`${dmSans_light.className} text-2xl md:text-3xl lg:text-[34px] mb-6 md:mb-8 lg:mb-10`}
+              className={`${dmSans_light.className} text-2xl md:text-3xl lg:text-[34px] mb-6 md:mb-8 lg:mb-10 tracking-tighter`}
             >
               Your Partner in Academic Integrity
             </h1>
 
             <p
-              className={`${dmSans_lighter.className} text-lg md:text-xl lg:text-3xl mb-12 md:mb-16 lg:mb-24`}
+              className={`${dmSans_lighter.className} text-lg md:text-xl lg:text-3xl mb-3`}
             >
               SleuthInk stands out with cutting-edge plagiarism detection
               tailored for students, teachers, and researchers. Our platform
               leverages APIs to deliver precise, real-time results, surpassing
-              free tools in accuracy and reliability. With a focus on privacy
-              and ease of use, SleuthInk helps you maintain originality in
-              assignments, grading, and research.
+              free tools in{" "}
+              <span className="bg-[#93b9b9] border-black border-l-2 border-r-2">
+                accuracy and reliability
+              </span>
+              . With a focus on privacy and ease of use, SleuthInk helps you
+              maintain originality in assignments, grading, and research.
             </p>
+            <RotatingBox className="inline-block">
+              <Link
+                href={"/register"}
+                className={`${dmSans_light.className} mt-4  px-8 py-6 md:px-12 md:py-5 text-[#E4E4E4] bg-[#044343] text-lg md:text-xl border-black border-b-8 border-l-8 border-r-2 border-t-2 rounded-3xl inline-block `}
+              >
+                Try It Now
+              </Link>
+            </RotatingBox>
           </div>
         </div>
 
@@ -149,7 +160,7 @@ export default function Home() {
         <div className="w-full max-w-8xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr_auto_1fr] items-center gap-6 lg:gap-8">
           {/* Upload Box */}
           <RotatingBox>
-            <div className="bg-[#044343] h-[20rem] md:h-[25rem] lg:h-[28rem] w-full aspect-[4/5] border-black border-b-8 border-l-8 border-r-2 border-t-2 text-[#E4E4E4] flex items-center justify-center rounded-4xl shadow-2xl shadow-gray-600">
+            <div className="bg-[#044343] h-[20rem] md:h-[25rem]  w-full aspect-[4/5] border-black border-b-8 border-l-8 border-r-2 border-t-2 text-[#E4E4E4] flex items-center justify-center rounded-4xl shadow-2xl shadow-gray-600">
               <div className="text-center flex flex-col items-center justify-center w-full max-w-md px-4">
                 <PiUploadFill className="text-6xl md:text-7xl lg:text-8xl mb-4 md:mb-5 lg:mb-6" />
                 <h1
@@ -172,7 +183,7 @@ export default function Home() {
 
           {/* Analysis Box */}
           <RotatingBox>
-            <div className="bg-[#044343] h-[20rem] md:h-[25rem] lg:h-[28rem] w-full aspect-[4/5] border-black border-b-8 border-l-8 border-r-2 border-t-2 text-[#E4E4E4] flex items-center justify-center rounded-4xl shadow-2xl shadow-gray-600">
+            <div className="bg-[#044343] h-[20rem] md:h-[25rem]  w-full aspect-[4/5] border-black border-b-8 border-l-8 border-r-2 border-t-2 text-[#E4E4E4] flex items-center justify-center rounded-4xl shadow-2xl shadow-gray-600">
               <div className="text-center flex flex-col items-center justify-center w-full max-w-md px-4">
                 <TbReportSearch className="text-6xl md:text-7xl lg:text-8xl mb-4 md:mb-5 lg:mb-6" />
                 <h1
@@ -195,7 +206,7 @@ export default function Home() {
 
           {/* Report Box */}
           <RotatingBox>
-            <div className="bg-[#044343] h-[20rem] md:h-[25rem] lg:h-[28rem] w-full aspect-[4/5] border-black border-b-8 border-l-8 border-r-2 border-t-2 text-[#E4E4E4] flex items-center justify-center rounded-4xl lg:rounded-4xl shadow-2xl shadow-gray-600">
+            <div className="bg-[#044343] h-[20rem] md:h-[25rem]  w-full aspect-[4/5] border-black border-b-8 border-l-8 border-r-2 border-t-2 text-[#E4E4E4] flex items-center justify-center rounded-4xl lg:rounded-4xl shadow-2xl shadow-gray-600">
               <div className="text-center flex flex-col items-center justify-center w-full max-w-md px-4">
                 <HiDocumentReport className="text-6xl md:text-7xl lg:text-8xl mb-4 md:mb-5 lg:mb-6" />
                 <h1
@@ -306,7 +317,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-
       {/* privacy-and-ethics */}
       <div
         id="privacy"
@@ -321,14 +331,14 @@ export default function Home() {
 
       <div className="w-full lg:h-[85vh] bg-[#E4E4E4] flex justify-center items-center py-8 lg:py-0">
         <div className="flex flex-col items-center space-y-6 md:space-y-4 w-full px-4 md:px-8 lg:px-0">
-          {/* Locked Tight */}
-          <RotatingBox className="w-full md:w-4/5 lg:w-3/5">
+          {/* Locked Tight - Tilted 30deg left */}
+          <div className="w-full md:w-4/5 lg:w-3/5 ">
             <div className="h-auto md:h-[15vh] lg:h-[20vh] border-black border-b-[12px] rounded-4xl border-l-[12px] border-r-2 border-t-2 flex items-center justify-center lg:rounded-5xl p-4 md:p-6">
               <h1
                 className={`${dmSans_lighter.className} text-lg md:text-xl lg:text-2xl text-[#044343] text-center md:text-left`}
               >
                 <span
-                  className={`${dmSans.className} text-xl font-extrabold md:text-2xl lg:text-3xl block md:inline`}
+                  className={`${dmSans.className} text-xl font-extrabold md:text-2xl lg:text-3xl block md:inline tracking-tighter`}
                 >
                   Locked Tight
                 </span>
@@ -339,16 +349,16 @@ export default function Home() {
                 </span>
               </h1>
             </div>
-          </RotatingBox>
+          </div>
 
-          {/* Gone in a Flash */}
-          <RotatingBox className="w-full md:w-4/5 lg:w-3/5">
+          {/* Gone in a Flash - Tilted 30deg right */}
+          <div className="w-full md:w-4/5 lg:w-3/5 ">
             <div className="h-auto md:h-[15vh] lg:h-[20vh] border-black border-b-[12px] rounded-4xl border-l-[12px] border-r-2 border-t-2 flex items-center justify-center lg:rounded-5xl p-4 md:p-6">
               <h1
-                className={`${dmSans_lighter.className} text-lg md:text-xl lg:text-2xl text-[#044343] text-center md:text-left`}
+                className={`${dmSans_lighter.className} text-lg md:text-xl lg:text-2xl text-[#044343] text-center md:text-left `}
               >
                 <span
-                  className={`${dmSans.className} text-xl md:text-2xl lg:text-3xl block md:inline`}
+                  className={`${dmSans.className} text-xl md:text-2xl lg:text-3xl block md:inline tracking-tighter`}
                 >
                   Gone in a Flash
                 </span>
@@ -359,16 +369,16 @@ export default function Home() {
                 </span>
               </h1>
             </div>
-          </RotatingBox>
+          </div>
 
-          {/* Fair and Square */}
-          <RotatingBox className="w-full md:w-4/5 lg:w-3/5">
+          {/* Fair and Square - Tilted 30deg left */}
+          <div className="w-full md:w-4/5 lg:w-3/5 transform ">
             <div className="h-auto md:h-[15vh] lg:h-[20vh] border-black border-b-[12px] rounded-4xl border-l-[12px] border-r-2 border-t-2 flex items-center justify-center lg:rounded-5xl p-4 md:p-6">
               <h1
                 className={`${dmSans_lighter.className} text-lg md:text-xl lg:text-2xl text-[#044343] text-center md:text-left`}
               >
                 <span
-                  className={`${dmSans.className} text-xl md:text-2xl lg:text-3xl block md:inline`}
+                  className={`${dmSans.className} text-xl md:text-2xl lg:text-3xl block md:inline tracking-tighter`}
                 >
                   Fair and Square
                 </span>
@@ -379,7 +389,7 @@ export default function Home() {
                 </span>
               </h1>
             </div>
-          </RotatingBox>
+          </div>
         </div>
       </div>
     </>
