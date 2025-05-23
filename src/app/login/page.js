@@ -16,18 +16,20 @@ const dmSans_lighter = DM_Sans({
 
 export default function Login() {
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
 
   useEffect(() => {
+    // Check if touch device
+    setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
+
     const handleMouseMove = (e) => {
-      // Get mouse position relative to window
-      const x = e.clientX / window.innerWidth;
-      const y = e.clientY / window.innerHeight;
-
-      // Calculate rotation values (adjust multiplier for more/less rotation)
-      const rotateY = (x - 0.5) * 20; // 20 degrees max rotation
-      const rotateX = (0.5 - y) * 20;
-
-      setRotation({ x: rotateX, y: rotateY });
+      if (!isTouchDevice) {
+        const x = e.clientX / window.innerWidth;
+        const y = e.clientY / window.innerHeight;
+        const rotateY = (x - 0.5) * 20;
+        const rotateX = (0.5 - y) * 20;
+        setRotation({ x: rotateX, y: rotateY });
+      }
     };
 
     window.addEventListener("mousemove", handleMouseMove);
@@ -35,51 +37,69 @@ export default function Login() {
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
     };
-  }, []);
+  }, [isTouchDevice]);
 
   return (
-    <div className="flex items-center justify-center h-[85vh] bg-[#E4E4E4]">
+    <div className="flex items-center justify-center md:h-[95vh] bg-[#E4E4E4] px-4 py-8 sm:px-6 lg:px-0 lg:py-0">
       <div
-        className="h-[78vh] w-6/12 bg-[#E4E4E4]   text-center rounded-4xl px-10 shadow-2xl"
+        className={`w-full max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl bg-[#E4E4E4] text-center rounded-3xl lg:rounded-4xl px-6 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12 shadow-lg lg:shadow-2xl ${
+          isTouchDevice
+            ? ""
+            : "transition-transform duration-100 ease-out transform-style-preserve-3d"
+        }`}
         style={{
-          transform: `perspective(1000px) rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
-          transition: "transform 0.1s ease-out",
-          transformStyle: "preserve-3d",
+          transform: isTouchDevice
+            ? "none"
+            : `perspective(1000px) rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
         }}
       >
         <h1
-          className={`${dmSans.className} text-6xl m-7 text-[#044343] tracking-[-5px] `}
+          className={`${dmSans.className} text-5xl  lg:text-6xl mb-6 sm:mb-7 lg:mb-8 text-[#044343] tracking-tight`}
         >
           Welcome Back.
         </h1>
-        <form>
+
+        <form className="space-y-4 sm:space-y-5 lg:space-y-6">
+          <div>
+            <input
+              type="email"
+              className={`${dmSans_lighter.className} border-b-4 sm:border-b-6 lg:border-b-8 border-l-4 sm:border-l-6 lg:border-l-8 border-t-2 border-r-2 rounded-3xl lg:rounded-4xl border-black text-base sm:text-lg lg:text-xl w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4`}
+              placeholder="Enter Email"
+              required
+            />
+            <p className="text-right mt-2 text-sm sm:text-base text-[#044343]">
+              <Link href="/forgot-password">Forgot Password?</Link>
+            </p>
+          </div>
+
           <input
-            type="text"
-            className={`${dmSans_lighter.className} border-b-8 border-l-8 border-t-2 border-r-2 rounded-4xl border-black text-xl w-full h-20 p-4 mb-4`}
-            placeholder="Enter Email"
-          />
-          <p className="text-right mr-5 text-[#044343]">Forgot Password?</p>
-          <input
-            type="text"
-            className={`${dmSans_lighter.className} border-b-8 border-l-8 border-t-2 border-r-2 rounded-4xl border-black text-xl w-full h-20 p-4 mb-9`}
+            type="password"
+            className={`${dmSans_lighter.className} border-b-4 sm:border-b-6 lg:border-b-8 border-l-4 sm:border-l-6 lg:border-l-8 border-t-2 border-r-2 rounded-3xl lg:rounded-4xl border-black text-base sm:text-lg lg:text-xl w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4`}
             placeholder="Enter Password"
+            required
           />
+
           <button
-            className={`${dmSans_lighter.className} border-b-8 border-l-8 border-t-2 border-r-2 rounded-4xl border-black text-xl w-full h-20 p-4 mb-4 bg-[#044343] text-[#E4E4E4]`}
             type="submit"
+            className={`${dmSans_lighter.className} border-b-4 sm:border-b-6 lg:border-b-8 border-l-4 sm:border-l-6 lg:border-l-8 border-t-2 border-r-2 rounded-3xl lg:rounded-4xl border-black text-base sm:text-lg lg:text-xl w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 bg-[#044343] text-[#E4E4E4] hover:bg-[#033333] transition-colors`}
           >
             Login
           </button>
+
           <button
-            className={`${dmSans_lighter.className} border-b-8 border-l-8 border-t-2 border-r-2 rounded-4xl border-black text-xl w-full h-20 p-4 mb-4 bg-[#044343] text-[#E4E4E4] flex justify-center items-center space-x-4`}
-            type="submit"
+            type="button"
+            className={`${dmSans_lighter.className} border-b-4 sm:border-b-6 lg:border-b-8 border-l-4 sm:border-l-6 lg:border-l-8 border-t-2 border-r-2 rounded-3xl lg:rounded-4xl border-black text-base sm:text-lg lg:text-xl w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 bg-[#044343] text-[#E4E4E4] hover:bg-[#033333] transition-colors flex items-center justify-center gap-2 sm:gap-3`}
           >
-            <BsGoogle />
-            <div>Signin with Google</div>
+            <BsGoogle className="text-lg" />
+            <span>Sign in with Google</span>
           </button>
-          <p className="text-center">
-            Don&apos;t have an account?{" "}
-            <Link href={"/register"} className="text-[#044343] underline">
+
+          <p className="text-sm sm:text-base text-center mt-4 sm:mt-5">
+            Don't have an account?{" "}
+            <Link
+              href="/register"
+              className="text-[#044343] font-medium underline hover:no-underline"
+            >
               Create Account
             </Link>
           </p>
