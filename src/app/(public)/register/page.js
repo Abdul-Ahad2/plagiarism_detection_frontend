@@ -14,6 +14,11 @@ const dmSans_lighter = DM_Sans({
   weight: ["300"],
 });
 
+const dmSans_light = DM_Sans({
+  subsets: ["latin"],
+  weight: ["600"],
+});
+
 export default function Register() {
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
   const [userRole, setUserRole] = useState("");
@@ -34,9 +39,9 @@ export default function Register() {
   }, []);
 
   return (
-    <div className="flex items-center justify-center sm:h-[120vh] bg-[#E4E4E4] px-4 sm:px-0">
+    <div className="flex items-center justify-center sm:h-[120vh] bg-purple-300 px-4 sm:px-0">
       <div
-        className="w-full sm:w-10/12 md:w-8/12 lg:w-6/12 bg-[#E4E4E4] shadow-2xl text-center rounded-3xl px-4 sm:px-10 py-10"
+        className="w-full sm:w-10/12 md:w-8/12 lg:w-6/12 bg-[#E4E4E4] shadow-2xl text-center rounded-3xl px-4 sm:px-10 py-10 border-black border-l-[12px] border-b-[12px] border-t-2 border-r-2"
         style={{
           transform: `perspective(1000px) rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
           transition: "transform 0.1s ease-out",
@@ -44,7 +49,7 @@ export default function Register() {
         }}
       >
         <h1
-          className={`${dmSans.className} text-5xl md:text-6xl m-5 text-[#044343] tracking-tight`}
+          className={`${dmSans.className} text-5xl md:text-6xl m-5 text-black tracking-tight`}
         >
           Create Account.
         </h1>
@@ -103,13 +108,13 @@ export default function Register() {
           />
 
           <button
-            className={`${dmSans_lighter.className} border-b-8 border-l-8 border-t-2 border-r-2 rounded-3xl sm:rounded-4xl border-black text-lg sm:text-xl w-full h-17 sm:h-20 p-4 mb-4 bg-[#044343] text-[#E4E4E4]`}
+            className={`${dmSans_light.className} border-b-8 border-l-8 border-t-2 border-r-2 rounded-3xl sm:rounded-4xl border-black text-lg sm:text-xl w-full h-17 sm:h-20 p-4 mb-4 bg-purple-300 text-black`}
             type="submit"
           >
             Register
           </button>
           <button
-            className={`${dmSans_lighter.className} border-b-8 border-l-8 border-t-2 border-r-2 rounded-3xl sm:rounded-4xl border-black text-lg sm:text-xl w-full h-17 sm:h-20 p-4 mb-4 bg-[#044343] text-[#E4E4E4] flex justify-center items-center space-x-3`}
+            className={`${dmSans_light.className} border-b-8 border-l-8 border-t-2 border-r-2 rounded-3xl sm:rounded-4xl border-black text-lg sm:text-xl w-full h-17 sm:h-20 p-4 mb-4 bg-purple-300 text-black flex justify-center items-center space-x-3`}
             type="button"
           >
             <BsGoogle />
@@ -117,7 +122,7 @@ export default function Register() {
           </button>
           <p className="text-center text-sm sm:text-base">
             Already have an account?{" "}
-            <Link href={"/login"} className="text-[#044343] underline">
+            <Link href={"/login"} className="text-black underline">
               Login
             </Link>
           </p>

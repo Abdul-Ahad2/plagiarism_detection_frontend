@@ -17,7 +17,7 @@ export default function Footer() {
     <>
       <div className="p-1 bg-[#E4E4E4]">
         <div
-          className={`${dmSans_light.className} w-full bg-[#033333] text-[#E4E4E4] rounded-xl`}
+          className={`${dmSans_light.className} w-full bg-black text-[#E4E4E4] rounded-xl`}
         >
           <div className="max-w-7xl mx-auto px-4 py-16 grid grid-cols-1 md:grid-cols-4 gap-8 text-center md:text-left">
             <div className="space-y-4">

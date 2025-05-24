@@ -16,7 +16,7 @@ export default function Navbar() {
   return (
     <>
       <div
-        className={`${dmSans.className} w-full bg-[#E4E4E4] h-[13vh] text-[#045757]`}
+        className={`${dmSans.className} w-full bg-[#E4E4E4] h-[13vh] text-black`}
       >
         {/* Mobile & Tablet View - Only Logo */}
         <div className="md:hidden flex items-center justify-center h-full">
