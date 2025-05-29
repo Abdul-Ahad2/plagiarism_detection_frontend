@@ -1,6 +1,7 @@
 import { Berkshire_Swash } from "next/font/google";
 import { DM_Sans } from "next/font/google";
 import Link from "next/link";
+import { BsTwitter, BsLinkedin, BsInstagram } from "react-icons/bs";
 
 const bs = Berkshire_Swash({
   subsets: ["latin"],
@@ -12,14 +13,19 @@ const dmSans_light = DM_Sans({
   weight: ["500"],
 });
 
+const dmSans_lighter = DM_Sans({
+  subsets: ["latin"],
+  weight: ["300"],
+});
+
 export default function Footer() {
   return (
     <>
-      <div className="p-1 bg-[#E4E4E4]">
+      <div className=" bg-[#E4E4E4]">
         <div
-          className={`${dmSans_light.className} w-full bg-black text-[#E4E4E4] rounded-xl`}
+          className={`${dmSans_lighter.className} w-full bg-black text-[#E4E4E4] `}
         >
-          <div className="max-w-7xl mx-auto px-4 py-16 grid grid-cols-1 md:grid-cols-4 gap-8 text-center md:text-left">
+          <div className="max-w-7xl mx-auto px-9 py-16 grid grid-cols-1 md:grid-cols-4 gap-8 text-center md:text-left">
             <div className="space-y-4">
               <h3 className={`${bs.className} text-4xl mb-4`}>SleuthInk</h3>
               <p className="text-lg">
@@ -98,15 +104,15 @@ export default function Footer() {
 
             <div className="space-y-4">
               <h4 className="text-2xl font-semibold">Connect With Us</h4>
-              <div className="flex justify-center md:justify-start space-x-4">
+              <div className="flex justify-start items-center  space-x-4">
                 <Link href="#" className="hover:text-[#F8D56B] transition">
-                  Twitter
+                  <BsTwitter />
                 </Link>
                 <Link href="#" className="hover:text-[#F8D56B] transition">
-                  LinkedIn
+                  <BsLinkedin />
                 </Link>
                 <Link href="#" className="hover:text-[#F8D56B] transition">
-                  Instagram
+                  <BsInstagram />
                 </Link>
               </div>
               <p className="text-lg mt-4">support@sleuthink.com</p>
@@ -114,26 +120,13 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      <div className="bg-[#E4E4E4] pt-0 p-1">
+      <div className="bg-[#E4E4E4] pt-0 ">
         <div
-          className={`${dmSans_light.className} w-full bg-black text-white py-4 text-center md:text-left rounded-xl`}
+          className={`${dmSans_lighter.className} w-full bg-gray-950 text-white py-4 text-center md:text-left `}
         >
-          <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between text-sm">
+          <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-center text-base">
             <div className="mb-2 md:mb-0">
               © {new Date().getFullYear()} SleuthInk. All Rights Reserved.
-            </div>
-            <div className="flex items-center justify-center space-x-4">
-              <Link href="/privacy" className="hover:text-[#F8D56B] transition">
-                Privacy Policy
-              </Link>
-              <span>|</span>
-              <Link href="/terms" className="hover:text-[#F8D56B] transition">
-                Terms of Service
-              </Link>
-              <span>|</span>
-              <Link href="/contact" className="hover:text-[#F8D56B] transition">
-                Contact Us
-              </Link>
             </div>
           </div>
         </div>

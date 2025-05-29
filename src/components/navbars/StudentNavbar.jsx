@@ -1,57 +1,97 @@
-import { DM_Sans } from "next/font/google";
-import { Berkshire_Swash } from "next/font/google";
+"use client";
+import { Berkshire_Swash, DM_Sans, Raleway } from "next/font/google";
+import { LiaHomeSolid } from "react-icons/lia";
+import { CiLogin } from "react-icons/ci";
+import { FiMenu } from "react-icons/fi";
+import { RxCross1 } from "react-icons/rx";
 import Link from "next/link";
-import { PiFileText, PiUpload, PiChartBar, PiGear } from "react-icons/pi";
-import { IoIosLogOut } from "react-icons/io";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
-const dmSans = DM_Sans({ subsets: ["latin"], weight: ["400"] });
+const rw = Raleway({
+  subsets: ["cyrillic", "latin"],
+  weight: ["500"],
+});
 
 const bs = Berkshire_Swash({
   subsets: ["latin"],
   weight: ["400"],
 });
 
-export default function StudentNavbar() {
+const ds = DM_Sans({
+  subsets: ["latin"],
+  weight: ["400"],
+});
+
+const menuItems = [
+  { href: "/dashboard/student/analytics", label: "Dashboard" },
+  { href: "/dashboard/student/upload", label: "Check Plagiarism" },
+  { href: "/dashboard/student/report", label: "Reports" },
+  { href: "/dashboard/student/settings", label: "Settings" },
+  { href: "/login", label: "Logout" },
+];
+
+export default function Navbar() {
+  const [isMenu, setIsMenu] = useState(false);
+
   return (
-    <div
-      className={`${dmSans.className} w-full bg-[#E4E4E4] h-[13vh] text-black `}
-    >
-      <div className="flex justify-between items-center h-full px-7">
-        {/* Left Section */}
-        <div className="flex items-center space-x-8">
-          <Link href="/dashboard/student/report" className="flex items-center">
-            <PiFileText className="mr-2" /> My Reports
-          </Link>
-          <Link href="/dashboard/student/upload" className="flex items-center">
-            <PiUpload className="mr-1" /> Check Plagiarism
-          </Link>
-        </div>
-
-        <div className=" flex items-center justify-center h-full">
-          <div className={`${bs.className} text-4xl font-bold text-black`}>
-            SleuthInk.
+    <>
+      <div className={`${ds.className} w-full h-20 top-0 right-0 z-50 fixed`}>
+        <div className="flex justify-between items-center h-20 px-6 backdrop-blur-sm bg-white/0 py-2">
+          <div className={`${bs.className} text-gray-200 text-4xl`}>
+            SluethInk.
           </div>
-        </div>
 
-        {/* Right Section */}
-        <div className="flex space-x-6">
-          <Link
-            href="/dashboard/student/analytics"
-            className="flex items-center"
-          >
-            <PiChartBar className="mr-1" /> Analytics
-          </Link>
-          <Link
-            href="/dashboard/student/settings"
-            className="flex items-center"
-          >
-            <PiGear className="mr-1" /> Settings
-          </Link>
-          <Link href="/" className="flex items-center">
-            <IoIosLogOut className="mr-1" /> Logout
-          </Link>
+          {!isMenu ? (
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="border-none relative text-sm md:text-base text-gray-300"
+              onClick={() => setIsMenu(true)}
+            >
+              <FiMenu className="text-4xl" />
+            </motion.div>
+          ) : (
+            <div
+              className={`${rw.className} flex items-center justify-center gap-12`}
+            >
+              <AnimatePresence>
+                {menuItems.map((item, index) => (
+                  <motion.div
+                    key={item.href}
+                    initial={{ opacity: 0, x: 50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 50 }}
+                    transition={{
+                      duration: 0.3,
+                      delay: index * 0.1,
+                      ease: "easeOut",
+                    }}
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <Link
+                      href={item.href}
+                      className={`${rw.className} text-gray-200 text-sm md:text-base`}
+                      onClick={() => setIsMenu(false)}
+                    >
+                      {item.label}
+                    </Link>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                className="border-none relative text-sm md:text-base text-gray-300"
+                onClick={() => setIsMenu(false)}
+              >
+                <RxCross1 className="text-4xl" />
+              </motion.div>
+            </div>
+          )}
         </div>
       </div>
-    </div>
+    </>
   );
 }

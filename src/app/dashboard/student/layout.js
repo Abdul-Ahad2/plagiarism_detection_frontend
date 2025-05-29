@@ -5,7 +5,7 @@ export default function StudentLayout({ children }) {
   return (
     <div className="">
       <StudentNavbar />
-      <main className="">{children}</main>
+      <main>{children}</main>
     </div>
   );
 }
