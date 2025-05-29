@@ -237,7 +237,7 @@ Machine learning algorithms can effectively identify copied content by comparing
                     <p
                       className={`${dmSans.className} bg-gray-600 p-3 rounded`}
                     >
-                      "{selectedMatch.text}"
+                      &quot;{selectedMatch.text}&quot;
                     </p>
                   </div>
 

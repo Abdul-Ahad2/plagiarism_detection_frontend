@@ -112,7 +112,7 @@ export default function Login() {
           </button>
 
           <p className="text-sm sm:text-base text-center mt-4 sm:mt-5">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link
               href="/register"
               className="text-transparent bg-gradient-to-r bg-clip-text from-purple-200 to-purple-400 border-purple-300 border-b-[1px] font-medium hover:no-underline"
