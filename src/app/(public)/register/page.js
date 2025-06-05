@@ -2,8 +2,10 @@
 import { DM_Sans, Raleway } from "next/font/google";
 import { BsGoogle } from "react-icons/bs";
 import { useState, useEffect } from "react";
-
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import axios from "axios";
+import { toast } from "sonner";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -12,7 +14,7 @@ const dmSans = DM_Sans({
 
 const dmSans_lighter = DM_Sans({
   subsets: ["latin"],
-  weight: ["600"],
+  weight: ["400"],
 });
 
 const dmSans_lightest = DM_Sans({
@@ -26,9 +28,16 @@ const rw = Raleway({
 });
 
 export default function Login() {
+  const router = useRouter();
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
   const [isTouchDevice, setIsTouchDevice] = useState(false);
-  const [userRole, setUserRole] = useState("");
+  const [form, setForm] = useState({
+    username: "",
+    email: "",
+    role: "",
+    password: "",
+    confirmPassword: "", // Added this field
+  });
 
   useEffect(() => {
     // Check if touch device
@@ -51,6 +60,68 @@ export default function Login() {
     };
   }, [isTouchDevice]);
 
+  const formHandler = async (e) => {
+    e.preventDefault();
+
+    // Password confirmation validation
+    if (form.password !== form.confirmPassword) {
+      toast.error("Passwords do not match!");
+      return;
+    }
+
+    console.log(process.env.NEXT_PUBLIC_API_BACKEND_URL + "/auth/register");
+
+    try {
+      // Check if environment variable is defined
+      if (!process.env.NEXT_PUBLIC_API_BACKEND_URL) {
+        throw new Error("Backend URL not configured");
+      }
+
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BACKEND_URL}/api/v1/auth/register`,
+        {
+          username: form.username,
+          email: form.email,
+          role: form.role,
+          password: form.password,
+        }
+      );
+
+      console.log("Registration successful:", response.data);
+      toast.success("You are now registered");
+      router.push(`/login`);
+    } catch (error) {
+      console.error("Registration error:", error);
+
+      if (error.code === "ERR_NETWORK") {
+        toast.error(
+          "Unable to connect to server. Please check if the server is running."
+        );
+      } else if (error.code === "ECONNABORTED") {
+        toast.error("Request timed out. Please try again.");
+      } else if (error.response) {
+        // Server responded with error status
+        toast.error(
+          error.response.data.error || "Registration failed. Please try again."
+        );
+      } else {
+        toast.error("An error occurred while registering. Please try again.");
+      }
+    }
+  };
+
+  const handleGoogleAuth = async () => {
+    try {
+      if (!process.env.NEXT_PUBLIC_API_BACKEND_URL) {
+        throw new Error("Backend URL not configured");
+      }
+      window.location.href = `${process.env.NEXT_PUBLIC_API_BACKEND_URL}/auth/google`;
+    } catch (error) {
+      console.log("Google login error:", error);
+      toast.error("An error occurred while logging in with Google.");
+    }
+  };
+
   return (
     <div className="flex items-center justify-center h-auto bg-gradient-to-r from-black to-gray-900 px-4 py-32 sm:px-6 lg:px-0 ">
       <div
@@ -71,37 +142,55 @@ export default function Login() {
           <span className="text-gray-300">Create</span> Account
         </h1>
 
-        <form className="space-y-4 sm:space-y-5 lg:space-y-6">
+        <form
+          onSubmit={formHandler}
+          className="space-y-4 sm:space-y-5 lg:space-y-6"
+        >
           <input
             type="text"
-            className={`${dmSans_lighter.className}  text-base sm:text-lg lg:text-xl w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 placeholder:text-gray-200 border-gray-200 border-b-[1px] focus:outline-none `}
+            value={form.username}
+            onChange={(e) => setForm({ ...form, username: e.target.value })}
+            name="username"
+            className={`${dmSans_lighter.className} bg-transparent text-base sm:text-lg lg:text-xl w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 placeholder:text-gray-400 text-gray-200 border-gray-200 border-b-[1px] focus:outline-none focus:border-purple-400`}
             placeholder="Full Name"
             required
           />
           <input
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            name="email"
             type="email"
-            className={`${dmSans_lighter.className}  text-base sm:text-lg lg:text-xl w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 placeholder:text-gray-200 border-gray-200 border-b-[1px] focus:outline-none `}
+            className={`${dmSans_lighter.className} bg-transparent text-base sm:text-lg lg:text-xl w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 placeholder:text-gray-400 text-gray-200 border-gray-200 border-b-[1px] focus:outline-none focus:border-purple-400`}
             placeholder="Enter Email"
             required
           />
 
           <div className="relative mb-4">
             <select
-              value={userRole}
-              onChange={(e) => setUserRole(e.target.value)}
-              className={`${dmSans_lighter.className} appearance-none   text-xl w-full h-17 sm:h-20 p-4  cursor-pointer focus:outline-none border-white border-b-[1px]`}
+              value={form.role}
+              onChange={(e) => {
+                setForm({ ...form, role: e.target.value });
+              }}
+              name="role"
+              className={`${dmSans_lighter.className} appearance-none bg-transparent text-gray-200 text-xl w-full h-17 sm:h-20 p-4 cursor-pointer focus:outline-none border-gray-200 border-b-[1px] focus:border-purple-400`}
               required
             >
-              <option value="" disabled hidden>
+              <option value="" disabled hidden className="text-gray-400">
                 Select your role
               </option>
-              <option value="student">Student</option>
-              <option value="teacher">Teacher</option>
-              <option value="researcher">Researcher</option>
+              <option value="student" className="text-black">
+                Student
+              </option>
+              <option value="teacher" className="text-black">
+                Teacher
+              </option>
+              <option value="researcher" className="text-black">
+                Researcher
+              </option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-6 pointer-events-none">
               <svg
-                className="w-5 h-5 sm:w-6 sm:h-6 text-[#044343]"
+                className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -117,28 +206,37 @@ export default function Login() {
           </div>
 
           <input
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            name="password"
             type="password"
-            className={`${dmSans_lighter.className}  text-base sm:text-lg lg:text-xl w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 placeholder:text-gray-200 border-gray-200 border-b-[1px] focus:outline-none `}
+            className={`${dmSans_lighter.className} bg-transparent text-base sm:text-lg lg:text-xl w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 placeholder:text-gray-400 text-gray-200 border-gray-200 border-b-[1px] focus:outline-none focus:border-purple-400`}
             placeholder="Enter Password"
             required
           />
           <input
+            value={form.confirmPassword}
+            onChange={(e) =>
+              setForm({ ...form, confirmPassword: e.target.value })
+            }
+            name="confirmPassword"
             type="password"
-            className={`${dmSans_lighter.className}  text-base sm:text-lg lg:text-xl w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 placeholder:text-gray-200 border-gray-200 border-b-[1px] focus:outline-none `}
-            placeholder="Confrim Password"
+            className={`${dmSans_lighter.className} bg-transparent text-base sm:text-lg lg:text-xl w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 placeholder:text-gray-400 text-gray-200 border-gray-200 border-b-[1px] focus:outline-none focus:border-purple-400`}
+            placeholder="Confirm Password"
             required
           />
 
           <button
             type="submit"
-            className={`${dmSans_lightest.className}  text-3xl w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 bg-gradient-to-r hover:bg-gradient-to-l hover:from-purple-900 hover:to-purple-400 from-purple-400 to-purple-900 text-gray-300`}
+            className={`${dmSans_lightest.className} text-3xl w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 bg-gradient-to-r hover:bg-gradient-to-l hover:from-purple-900 hover:to-purple-400 from-purple-400 to-purple-900 text-gray-300 transition-all duration-300`}
           >
             Register
           </button>
 
           <button
             type="button"
-            className={`${dmSans_lightest.className} bg-gradient-to-l text-3xl from-purple-400 to-purple-900 text-gray-300 w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4   flex items-center justify-center gap-2 sm:gap-3`}
+            onClick={handleGoogleAuth}
+            className={`${dmSans_lightest.className} bg-gradient-to-l text-3xl from-purple-400 to-purple-900 text-gray-300 w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 flex items-center justify-center gap-2 sm:gap-3 transition-all duration-300 hover:from-purple-500 hover:to-purple-800`}
           >
             <BsGoogle className="text-3xl" />
             <span>Sign up with Google</span>
@@ -157,37 +255,4 @@ export default function Login() {
       </div>
     </div>
   );
-}
-
-{
-  /* <div className="relative mb-4">
-  <select
-    value={userRole}
-    onChange={(e) => setUserRole(e.target.value)}
-    className={`${dmSans_lighter.className} appearance-none border-b-8 border-l-8 border-t-2 border-r-2 rounded-3xl sm:rounded-4xl border-black text-lg sm:text-xl w-full h-17 sm:h-20 p-4 bg-[#E4E4E4] cursor-pointer`}
-    required
-  >
-    <option value="" disabled hidden>
-      Select your role
-    </option>
-    <option value="student">Student</option>
-    <option value="teacher">Teacher</option>
-    <option value="researcher">Researcher</option>
-  </select>
-  <div className="absolute inset-y-0 right-0 flex items-center pr-6 pointer-events-none">
-    <svg
-      className="w-5 h-5 sm:w-6 sm:h-6 text-[#044343]"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M19 9l-7 7-7-7"
-      />
-    </svg>
-  </div>
-</div> */
 }

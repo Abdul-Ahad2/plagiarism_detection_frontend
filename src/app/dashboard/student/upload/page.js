@@ -1,9 +1,12 @@
+// src/app/dashboard/student/report/upload/page.js
 "use client";
+
 import { useState, useCallback } from "react";
 import { LiaCloudUploadAltSolid } from "react-icons/lia";
 import { FiFile, FiX } from "react-icons/fi";
 import RotatingBox from "@/components/RotatingBox";
 import { DM_Sans, Raleway } from "next/font/google";
+import { fetchReports, postPlagiarismCheck } from "../../../../../lib/api"; // make sure this path points to your actual API helper
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -71,13 +74,28 @@ export default function UploadPage() {
     }
 
     setIsLoading(true);
+    setError(null);
+
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      // Redirect to results page after successful upload
-      // router.push('/results');
+      const formData = new FormData();
+      formData.append("file", file);
+
+      // call your FastAPI (or other backend) endpoint
+      await postPlagiarismCheck(formData);
+      const data = await fetchReports();
+      console.log("API returned:", data[data.length - 1].id); // Log the last report for debugging
+
+      // Redirect to `/dashboard/student/report/[reportId]` using the _id returned by the backend
+      // (If your backend uses `id` instead of `_id`, change this to data.id)
+      if (data[data.length - 1].id) {
+        window.location.href =
+          "/dashboard/student/report/" + data[data.length - 1].id;
+      } else {
+        throw new Error("No report ID returned from server");
+      }
     } catch (err) {
-      setError("An error occurred during upload. Please try again.");
+      console.error(err);
+      setError(err.message || "An error occurred during upload");
     } finally {
       setIsLoading(false);
     }
@@ -152,6 +170,7 @@ export default function UploadPage() {
                 </p>
               </div>
             )}
+
             {error && (
               <p className={`${dmSans.className} text-red-400 mt-4`}>{error}</p>
             )}

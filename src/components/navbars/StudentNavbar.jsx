@@ -7,6 +7,7 @@ import { RxCross1 } from "react-icons/rx";
 import Link from "next/link";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation"; // ← import the router
 
 const rw = Raleway({
   subsets: ["cyrillic", "latin"],
@@ -28,11 +29,25 @@ const menuItems = [
   { href: "/dashboard/student/upload", label: "Check Plagiarism" },
   { href: "/dashboard/student/report", label: "Reports" },
   { href: "/dashboard/student/settings", label: "Settings" },
+  // We’ll still list Logout here, but handle it specially in the rendering logic:
   { href: "/login", label: "Logout" },
 ];
 
 export default function Navbar() {
+  const router = useRouter();
   const [isMenu, setIsMenu] = useState(false);
+
+  // ① This function runs when the user clicks “Logout”
+  const handleLogout = () => {
+    // Remove the token (adjust the key name to whatever you used)
+    localStorage.removeItem("token");
+
+    // Optionally, clear any other user‐related state in localStorage:
+    // localStorage.removeItem("userRole");
+
+    // Redirect to /login
+    router.push("/login");
+  };
 
   return (
     <>
@@ -56,28 +71,59 @@ export default function Navbar() {
               className={`${rw.className} flex items-center justify-center gap-12`}
             >
               <AnimatePresence>
-                {menuItems.map((item, index) => (
-                  <motion.div
-                    key={item.href}
-                    initial={{ opacity: 0, x: 50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 50 }}
-                    transition={{
-                      duration: 0.3,
-                      delay: index * 0.1,
-                      ease: "easeOut",
-                    }}
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    <Link
-                      href={item.href}
-                      className={`${rw.className} text-gray-200 text-sm md:text-base`}
-                      onClick={() => setIsMenu(false)}
+                {menuItems.map((item, index) => {
+                  // ② Handle “Logout” differently:
+                  if (item.label === "Logout") {
+                    return (
+                      <motion.div
+                        key="logout"
+                        initial={{ opacity: 0, x: 50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 50 }}
+                        transition={{
+                          duration: 0.3,
+                          delay: index * 0.1,
+                          ease: "easeOut",
+                        }}
+                        whileHover={{ scale: 1.05 }}
+                      >
+                        <button
+                          onClick={() => {
+                            setIsMenu(false);
+                            handleLogout();
+                          }}
+                          className={`${rw.className} text-gray-200 text-sm md:text-base`}
+                        >
+                          {item.label}
+                        </button>
+                      </motion.div>
+                    );
+                  }
+
+                  // ③ For all other items, render a normal Link
+                  return (
+                    <motion.div
+                      key={item.href}
+                      initial={{ opacity: 0, x: 50 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 50 }}
+                      transition={{
+                        duration: 0.3,
+                        delay: index * 0.1,
+                        ease: "easeOut",
+                      }}
+                      whileHover={{ scale: 1.05 }}
                     >
-                      {item.label}
-                    </Link>
-                  </motion.div>
-                ))}
+                      <Link
+                        href={item.href}
+                        className={`${rw.className} text-gray-200 text-sm md:text-base`}
+                        onClick={() => setIsMenu(false)}
+                      >
+                        {item.label}
+                      </Link>
+                    </motion.div>
+                  );
+                })}
               </AnimatePresence>
 
               <motion.div

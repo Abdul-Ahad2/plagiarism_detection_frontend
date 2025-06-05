@@ -1,18 +1,16 @@
 "use client";
+
 import { DM_Sans, Raleway } from "next/font/google";
 import { BsGoogle } from "react-icons/bs";
 import { useState, useEffect } from "react";
-
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  weight: ["1000"],
-});
+import axios from "axios";
+import { toast, Toaster } from "sonner";
 
 const dmSans_lighter = DM_Sans({
   subsets: ["latin"],
-  weight: ["600"],
+  weight: ["400"],
 });
 
 const dmSans_lightest = DM_Sans({
@@ -26,11 +24,17 @@ const rw = Raleway({
 });
 
 export default function Login() {
+  const router = useRouter();
+
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
   const [isTouchDevice, setIsTouchDevice] = useState(false);
 
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+
   useEffect(() => {
-    // Check if touch device
     setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
 
     const handleMouseMove = (e) => {
@@ -44,84 +48,154 @@ export default function Login() {
     };
 
     window.addEventListener("mousemove", handleMouseMove);
-
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
     };
   }, [isTouchDevice]);
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!form.email || !form.password) {
+      toast.error("Please enter both email and password.");
+      return;
+    }
+
+    const backendUrl = process.env.NEXT_PUBLIC_API_BACKEND_URL;
+    if (!backendUrl) {
+      toast.error("Server URL is not configured.");
+      return;
+    }
+    const loginUrl = `${backendUrl}/api/v1/auth/login`;
+
+    const toastId = toast.loading("Signing in…");
+
+    try {
+      const response = await axios.post(loginUrl, {
+        email: form.email,
+        password: form.password,
+      });
+
+      const data = response.data;
+      localStorage.setItem("token", data.token);
+      console.log(data);
+
+      toast.success(`Welcome back, ${data.user.username}!`, { id: toastId });
+
+      const userRole = data.user.role;
+      router.push(`/dashboard/${userRole}/upload`);
+    } catch (error) {
+      console.error("Login error full:", error);
+
+      if (error.response) {
+        const serverMsg = error.response.data.error || "Login failed";
+        toast.error(serverMsg, { id: toastId });
+      } else {
+        toast.error("Network error. Please try again.", { id: toastId });
+      }
+    }
+  };
+
   return (
-    <div className="flex items-center justify-center h-auto bg-gradient-to-r from-black to-gray-900 px-4 py-32 sm:px-6 lg:px-0 ">
-      <div
-        className={`w-full max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl text-center rounded-3xl lg:rounded-4xl px-6 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12 shadow-lg lg:shadow-2xl text-gray-200 ${
-          isTouchDevice
-            ? ""
-            : "transition-transform duration-100 ease-out transform-style-preserve-3d"
-        }`}
-        style={{
-          transform: isTouchDevice
-            ? "none"
-            : `perspective(1000px) rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
-        }}
-      >
-        <h1
-          className={`${rw.className} text-7xl   mb-6 sm:mb-7 lg:mb-8 text-transparent bg-gradient-to-r from-purple-300 to-purple-950 bg-clip-text  tracking-tight`}
+    <>
+      {/* 3) Render the Toaster once */}
+
+      <div className="flex items-center justify-center h-auto bg-gradient-to-r from-black to-gray-900 px-4 py-32 sm:px-6 lg:px-0">
+        <div
+          className={`w-full max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl text-center rounded-3xl lg:rounded-4xl
+                      px-6 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12 shadow-lg lg:shadow-2xl text-gray-200
+                      ${
+                        isTouchDevice
+                          ? ""
+                          : "transition-transform duration-100 ease-out transform-style-preserve-3d"
+                      }`}
+          style={{
+            transform: isTouchDevice
+              ? "none"
+              : `perspective(1000px) rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
+          }}
         >
-          Welcome <span className="text-gray-300">Back</span>
-        </h1>
+          <h1
+            className={`${rw.className} text-7xl mb-6 sm:mb-7 lg:mb-8
+                        text-transparent bg-gradient-to-r from-purple-300 to-purple-950 bg-clip-text tracking-tight`}
+          >
+            Welcome <span className="text-gray-300">Back</span>
+          </h1>
 
-        <form className="space-y-4 sm:space-y-5 lg:space-y-6">
-          <input
-            type="email"
-            className={`${dmSans_lighter.className}  text-base sm:text-lg lg:text-xl w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 placeholder:text-gray-200 border-gray-200 border-b-[1px] focus:outline-none `}
-            placeholder="Enter Email"
-            required
-          />
-
-          <div>
-            <p className="text-right text-sm mr-3 sm:text-base ">
-              <Link
-                href="/forgot-password"
-                className="text-transparent bg-gradient-to-r bg-clip-text from-purple-200 to-purple-400 border-purple-300 border-b-[1px]"
-              >
-                Forgot Password?
-              </Link>
-            </p>
-
+          {/* 4) Login form */}
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-4 sm:space-y-5 lg:space-y-6"
+          >
             <input
-              type="password"
-              className={`${dmSans_lighter.className}  text-base sm:text-lg lg:text-xl w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 placeholder:text-gray-200 border-gray-200 border-b-[1px] focus:outline-none `}
-              placeholder="Enter Password"
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              className={`${dmSans_lighter.className} text-base sm:text-lg lg:text-xl w-full
+                          h-17 md:h-16 lg:h-20 p-3 sm:p-4 placeholder:text-gray-200
+                          border-gray-200 border-b-[1px] focus:outline-none`}
+              placeholder="Enter Email"
               required
             />
-          </div>
 
-          <button
-            type="submit"
-            className={`${dmSans_lightest.className}  text-3xl w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 bg-gradient-to-r hover:bg-gradient-to-l hover:from-purple-900 hover:to-purple-400 from-purple-400 to-purple-900 text-gray-300`}
-          >
-            Login
-          </button>
+            <div>
+              <p className="text-right text-sm mr-3 sm:text-base">
+                <Link
+                  href="/forgot-password"
+                  className="text-transparent bg-gradient-to-r bg-clip-text from-purple-200 to-purple-400 border-purple-300 border-b-[1px]"
+                >
+                  Forgot Password?
+                </Link>
+              </p>
+              <input
+                name="password"
+                type="password"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                className={`${dmSans_lighter.className} text-base sm:text-lg lg:text-xl w-full
+                            h-17 md:h-16 lg:h-20 p-3 sm:p-4 placeholder:text-gray-200
+                            border-gray-200 border-b-[1px] focus:outline-none`}
+                placeholder="Enter Password"
+                required
+              />
+            </div>
 
-          <button
-            type="button"
-            className={`${dmSans_lightest.className} bg-gradient-to-l text-3xl from-purple-400 to-purple-900 text-gray-300 w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4   flex items-center justify-center gap-2 sm:gap-3`}
-          >
-            <BsGoogle className="text-3xl" />
-            <span>Sign in with Google</span>
-          </button>
-
-          <p className="text-sm sm:text-base text-center mt-4 sm:mt-5">
-            Don&apos;t have an account?{" "}
-            <Link
-              href="/register"
-              className="text-transparent bg-gradient-to-r bg-clip-text from-purple-200 to-purple-400 border-purple-300 border-b-[1px] font-medium hover:no-underline"
+            <button
+              type="submit"
+              className={`${dmSans_lightest.className} text-3xl w-full h-17 md:h-16 lg:h-20
+                          p-3 sm:p-4 bg-gradient-to-r hover:bg-gradient-to-l hover:from-purple-900
+                          hover:to-purple-400 from-purple-400 to-purple-900 text-gray-300`}
             >
-              Create Account
-            </Link>
-          </p>
-        </form>
+              Login
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                window.location.href = `${process.env.NEXT_PUBLIC_API_BACKEND_URL}/api/v1/auth/google`;
+              }}
+              className={`${dmSans_lightest.className} bg-gradient-to-l text-3xl from-purple-400 to-purple-900
+                          text-gray-300 w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 flex items-center justify-center
+                          gap-2 sm:gap-3`}
+            >
+              <BsGoogle className="text-3xl" />
+              <span>Sign in with Google</span>
+            </button>
+
+            <p className="text-sm sm:text-base text-center mt-4 sm:mt-5">
+              Don&apos;t have an account?{" "}
+              <Link
+                href="/register"
+                className="text-transparent bg-gradient-to-r bg-clip-text from-purple-200 to-purple-400
+                           border-purple-300 border-b-[1px] font-medium hover:no-underline"
+              >
+                Create Account
+              </Link>
+            </p>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
