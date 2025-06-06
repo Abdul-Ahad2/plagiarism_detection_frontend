@@ -2,11 +2,12 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { LiaCloudUploadAltSolid } from "react-icons/lia";
 import { FiFile, FiX } from "react-icons/fi";
 import RotatingBox from "@/components/RotatingBox";
 import { DM_Sans, Raleway } from "next/font/google";
-import { fetchReports, postPlagiarismCheck } from "../../../../../lib/api"; // make sure this path points to your actual API helper
+import axios from "axios"; // <-- make sure axios is installed
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -23,7 +24,28 @@ const rw_bold = Raleway({
   weight: ["700"],
 });
 
+// If you already have a shared “API helper” file, you can move these two functions there.
+// For demo purposes, we’ll define them inline:
+
+async function postPlagiarismCheck(formData) {
+  const token = localStorage.getItem("token"); // or grab it from wherever you keep it
+  if (!token) throw new Error("No auth token found");
+
+  const response = await axios.post(
+    process.env.NEXT_PUBLIC_API_BASE_URL + "/plagiarism/check",
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+}
+
 export default function UploadPage() {
+  const router = useRouter();
   const [file, setFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -80,19 +102,11 @@ export default function UploadPage() {
       const formData = new FormData();
       formData.append("file", file);
 
-      // call your FastAPI (or other backend) endpoint
-      await postPlagiarismCheck(formData);
-      const data = await fetchReports();
-      console.log("API returned:", data[data.length - 1].id); // Log the last report for debugging
+      // 1) Upload the file to /check-plagiarism (with token in headers)
+      const res = await postPlagiarismCheck(formData);
+      console.log(res);
 
-      // Redirect to `/dashboard/student/report/[reportId]` using the _id returned by the backend
-      // (If your backend uses `id` instead of `_id`, change this to data.id)
-      if (data[data.length - 1].id) {
-        window.location.href =
-          "/dashboard/student/report/" + data[data.length - 1].id;
-      } else {
-        throw new Error("No report ID returned from server");
-      }
+      router.push("/dashboard/student/report/" + res.id);
     } catch (err) {
       console.error(err);
       setError(err.message || "An error occurred during upload");

@@ -8,7 +8,7 @@ export default function PublicLayout({ children }) {
       <Navbar />
       {children}
       <Toaster
-        position="top-center"
+        position="bottom-right"
         richColors
         closeButton
         toastOptions={{

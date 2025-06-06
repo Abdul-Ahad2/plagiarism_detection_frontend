@@ -9,7 +9,8 @@ import {
   PiFunnel,
   PiInfo,
 } from "react-icons/pi";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -39,8 +40,8 @@ const mockReports = [
     date: "2023-11-15",
     similarity: 100,
     sources: ["arXiv", "CORE", "Wikipedia"],
-    wordCount: 5240,
-    timeSpent: "2 min 45 sec",
+    word_count: 5240,
+    time_spent: "2 min 45 sec",
     flagged: true,
   },
   {
@@ -50,7 +51,7 @@ const mockReports = [
     similarity: 45,
     sources: ["PubMed", "DOAJ"],
     wordCount: 3120,
-    timeSpent: "1 min 58 sec",
+    time_spent: "1 min 58 sec",
     flagged: false,
   },
   {
@@ -60,14 +61,31 @@ const mockReports = [
     similarity: 12,
     sources: ["CORE", "Wikipedia"],
     wordCount: 8920,
-    timeSpent: "4 min 12 sec",
+    time_spent: "4 min 12 sec",
     flagged: false,
   },
 ];
 
 export default function ReportsPage() {
+  useEffect(() => {
+    const fetchReports = async () => {
+      const response = await axios.get(
+        process.env.NEXT_PUBLIC_API_BACKEND_URL + "/api/v1/reports/get-reports",
+        {
+          headers: {
+            // Most APIs expect the header name "Authorization" with value "Bearer <token>"
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setReports(response.data.reports);
+      // Adjust the API endpoint as needed
+    };
+    fetchReports();
+  }, []);
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [reports, setReports] = useState(mockReports);
+  const [reports, setReports] = useState([]);
   const [viewingReport, setViewingReport] = useState(null);
   const [activeTab, setActiveTab] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
@@ -86,7 +104,7 @@ export default function ReportsPage() {
       return true;
     })
     .filter((report) =>
-      report.title.toLowerCase().includes(searchTerm.toLowerCase())
+      report.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
   // Sort reports
@@ -242,12 +260,12 @@ export default function ReportsPage() {
                     <h3
                       className={`${rw_bold.className} text-xl text-white mb-1`}
                     >
-                      {report.title}
+                      {report.name}
                     </h3>
                     <p
                       className={`${dmSans_light.className} text-gray-400 text-sm`}
                     >
-                      {report.date} • {report.wordCount.toLocaleString()} words
+                      {report.date} • {report.word_count.toLocaleString()} words
                     </p>
                   </div>
                   <button
@@ -294,7 +312,7 @@ export default function ReportsPage() {
                 <div className="flex justify-between items-center text-sm text-gray-400 mb-4">
                   <div className="flex items-center gap-1">
                     <PiClock size={14} />
-                    <span>{report.timeSpent}</span>
+                    <span>{report.time_spent}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <PiInfo size={14} />
@@ -338,11 +356,11 @@ export default function ReportsPage() {
                   <h2
                     className={`${rw_bold.className} text-2xl md:text-3xl text-white mb-1`}
                   >
-                    {viewingReport.title}
+                    {viewingReport.name}
                   </h2>
                   <p className={`${dmSans_light.className} text-gray-400`}>
                     Analyzed on {viewingReport.date} •{" "}
-                    {viewingReport.wordCount.toLocaleString()} words
+                    {viewingReport.word_count.toLocaleString()} words
                   </p>
                 </div>
                 <button
@@ -403,7 +421,7 @@ export default function ReportsPage() {
                     </h4>
                   </div>
                   <p className={`${dmSans_light.className} text-gray-300`}>
-                    {viewingReport.timeSpent}
+                    {viewingReport.time_spent}
                   </p>
                 </div>
 

@@ -5,7 +5,8 @@ import { useState, useEffect, useRef } from "react";
 import { DM_Sans, Raleway } from "next/font/google";
 import { PiArrowLeft, PiInfo } from "react-icons/pi";
 import Link from "next/link";
-import { fetchReportDetail } from "../../../../../../lib/api";
+import axios from "axios";
+import { useParams } from "next/navigation";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -26,7 +27,7 @@ export default function DocumentAnalysisPage() {
   const [document, setDocument] = useState({
     name: "",
     content: "",
-    plagiarismData: [], // ← ensure this starts as an array
+    plagiarismData: [],
     time_spent: "",
     sources: [],
   });
@@ -34,29 +35,36 @@ export default function DocumentAnalysisPage() {
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [activeTab, setActiveTab] = useState("all");
   const contentRef = useRef(null);
+  const { reportId } = useParams(); // destructure the dynamic segment
 
-  // Fetch report detail once on mount
+  // Fetch report detail once on mount (when reportId is available)
   useEffect(() => {
+    if (!reportId) return;
+
     const fetchDocument = async () => {
       try {
-        const reportId = window.location.pathname.split("/").pop();
-        const data = await fetchReportDetail(reportId);
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BACKEND_URL}/api/v1/reports/plagiarized-report/${reportId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+            },
+          }
+        );
+        const data = response.data.report[0];
+        console.log(data);
 
-        // Remap the underscored fields into camelCase
         setDocument({
           name: data.name || "",
           content: data.content || "",
-
-          // Pay attention here: your code expects `plagiarismData`, but API gives `plagiarism_data`
           plagiarismData: Array.isArray(data.plagiarism_data)
             ? data.plagiarism_data.map((item) => ({
                 text: item.matched_text,
-                similarity: (item.similarity * 100).toPrecision(3), // Convert to percentage
+                similarity: (item.similarity * 100).toFixed(2), // e.g. 0.87 → "87.00"
                 source: item.source_title,
                 url: item.source_url,
               }))
             : [],
-
           time_spent: data.time_spent || "",
           sources: Array.isArray(data.sources) ? data.sources : [],
         });
@@ -66,10 +74,9 @@ export default function DocumentAnalysisPage() {
     };
 
     fetchDocument();
-  }, []);
-  // ← empty dependency array
+  }, [reportId]);
 
-  // Helper to HTML‐escape a string (so that injecting <span> tags is safe)
+  // Helper to HTML‐escape a string
   function escapeForHtml(str) {
     return str
       .replace(/&/g, "&amp;")
@@ -81,31 +88,24 @@ export default function DocumentAnalysisPage() {
 
   // Helper to turn arbitrary text into a regex‐safe pattern
   function escapeRegex(str) {
-    // This escapes characters like . * + ? ^ $ { } ( ) | [ ] \ / so they are matched literally
     return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
   }
 
+  // Highlight plagiarized text by wrapping matches in <span>
   const highlightPlagiarizedText = () => {
-    // 1) Escape the entire document content first:
     let escapedContent = escapeForHtml(document.content || "");
 
-    // 2) Sort your matches by descending similarity, so that highest matches go first:
+    // Sort matches by descending similarity
     const sortedMatches = [...(document.plagiarismData || [])].sort(
       (a, b) => b.similarity - a.similarity
     );
 
-    // 3) Now loop through each match and wrap it in a <span>.
-    //    We build a regex out of the raw `matchObj.text`.
     sortedMatches.forEach((matchObj) => {
       if (!matchObj || !matchObj.text) return;
 
-      //   a) Get the raw phrase (no HTML‐escaping) that we want to highlight:
       const rawPhrase = matchObj.text;
-
-      //   b) Escape the phrase for use in a regex:
       const phraseRegex = new RegExp(escapeRegex(rawPhrase), "gi");
 
-      //   c) Choose a color class based on similarity:
       const colorClass =
         matchObj.similarity > 75
           ? "bg-red-500"
@@ -113,10 +113,6 @@ export default function DocumentAnalysisPage() {
           ? "bg-orange-500"
           : "bg-yellow-500";
 
-      //   d) Now replace ALL instances of that escaped phrase in the already‐escaped content.
-      //      Since `escapedContent` is fully HTML‐escaped, matching `rawPhrase` via `phraseRegex`
-      //      will only succeed if the original text was in the document exactly.
-      //      We must wrap it in a `<span>` that re‐inserts the *unescaped* rawPhrase:
       escapedContent = escapedContent.replace(
         phraseRegex,
         `<span class="${colorClass} text-white px-1 cursor-pointer hover:opacity-90" data-id="${escapeForHtml(
@@ -125,25 +121,23 @@ export default function DocumentAnalysisPage() {
       );
     });
 
-    // 4) Return an object suitable for React’s dangerouslySetInnerHTML
     return { __html: escapedContent };
   };
 
-  // Handle text‐click selection
+  // Handle click on highlighted spans
   useEffect(() => {
     const handleClick = (e) => {
       const highlightedSpan = e.target.closest("span[data-id]");
       if (highlightedSpan) {
         const text = highlightedSpan.getAttribute("data-id");
+        const decodedText = text
+          .replace(/&amp;/g, "&")
+          .replace(/&lt;/g, "<")
+          .replace(/&gt;/g, ">")
+          .replace(/&quot;/g, '"')
+          .replace(/&#039;/g, "'");
         const match = document.plagiarismData.find(
-          (m) =>
-            m.text ===
-            text
-              .replace(/&amp;/g, "&")
-              .replace(/&lt;/g, "<")
-              .replace(/&gt;/g, ">")
-              .replace(/&quot;/g, '"')
-              .replace(/&#039;/g, "'")
+          (m) => m.text === decodedText
         );
         setSelectedMatch(match);
       }
@@ -161,17 +155,15 @@ export default function DocumentAnalysisPage() {
     };
   }, [document.plagiarismData]);
 
-  // Helpers for summary
+  // Summary helpers
   const totalMatches = Array.isArray(document.plagiarismData)
     ? document.plagiarismData.length
     : 0;
 
   const highestSimilarity =
     totalMatches > 0
-      ? Math.max(...document.plagiarismData.map((m) => m.similarity))
+      ? Math.max(...document.plagiarismData.map((m) => Number(m.similarity)))
       : 0;
-
-  // const totalMatches = document.plagiarismData.length;
 
   const averageSimilarity =
     totalMatches > 0
@@ -182,8 +174,6 @@ export default function DocumentAnalysisPage() {
           ) / totalMatches
         ).toFixed(3)
       : "0.000";
-
-  console.log("Average Similarity:", averageSimilarity + "%");
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-black to-gray-900 text-gray-300 py-44">
@@ -295,7 +285,7 @@ export default function DocumentAnalysisPage() {
                       {selectedMatch.source}
                     </p>
                     <a
-                      href={"https://core.ac.uk/works/" + selectedMatch.url}
+                      href={selectedMatch.url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className={`${dmSans.className} text-blue-400 text-sm hover:underline flex items-center gap-1`}
@@ -330,7 +320,7 @@ export default function DocumentAnalysisPage() {
                         selectedMatch.similarity > 75
                           ? "text-red-400"
                           : selectedMatch.similarity > 50
-                          ? "text-orangě-400"
+                          ? "text-orange-400"
                           : "text-yellow-400"
                       }`}
                     >
@@ -354,7 +344,9 @@ export default function DocumentAnalysisPage() {
                   {document.plagiarismData && document.plagiarismData.length > 0
                     ? document.plagiarismData
                         .filter((match) =>
-                          activeTab === "all" ? true : match.similarity > 70
+                          activeTab === "all"
+                            ? true
+                            : Number(match.similarity) > 70
                         )
                         .map((match, index) => (
                           <div
@@ -362,7 +354,7 @@ export default function DocumentAnalysisPage() {
                             className={`p-4 rounded-lg cursor-pointer hover:bg-gray-700 transition ${
                               match.similarity > 75
                                 ? "border-l-4 border-red-500 bg-gray-750"
-                                : match.similarity > 30
+                                : match.similarity > 50
                                 ? "border-l-4 border-orange-500 bg-gray-750"
                                 : "border-l-4 border-yellow-500 bg-gray-750"
                             }`}
