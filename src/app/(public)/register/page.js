@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
 import { toast } from "sonner";
+import { signIn } from "next-auth/react";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -69,57 +70,26 @@ export default function Login() {
       return;
     }
 
-    console.log(process.env.NEXT_PUBLIC_API_BACKEND_URL + "/auth/register");
-
     try {
-      // Check if environment variable is defined
-      if (!process.env.NEXT_PUBLIC_API_BACKEND_URL) {
-        throw new Error("Backend URL not configured");
-      }
+      await axios.post(`/api/auth/register`, {
+        username: form.username,
+        email: form.email,
+        role: form.role,
+        password: form.password,
+      });
 
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BACKEND_URL}/api/v1/auth/register`,
-        {
-          username: form.username,
-          email: form.email,
-          role: form.role,
-          password: form.password,
-        }
-      );
-
-      console.log("Registration successful:", response.data);
-      toast.success("You are now registered");
-      router.push(`/login`);
+      toast.success("Registration successful!");
+      router.push("/login");
     } catch (error) {
-      console.error("Registration error:", error);
-
-      if (error.code === "ERR_NETWORK") {
-        toast.error(
-          "Unable to connect to server. Please check if the server is running."
-        );
-      } else if (error.code === "ECONNABORTED") {
-        toast.error("Request timed out. Please try again.");
-      } else if (error.response) {
-        // Server responded with error status
-        toast.error(
-          error.response.data.error || "Registration failed. Please try again."
-        );
-      } else {
-        toast.error("An error occurred while registering. Please try again.");
-      }
+      toast.error(
+        error.response.data.error || "Registration failed. Please try again."
+      );
+      console.log(error.response.data.error);
     }
   };
 
   const handleGoogleAuth = async () => {
-    try {
-      if (!process.env.NEXT_PUBLIC_API_BACKEND_URL) {
-        throw new Error("Backend URL not configured");
-      }
-      window.location.href = `${process.env.NEXT_PUBLIC_API_BACKEND_URL}/auth/google`;
-    } catch (error) {
-      console.log("Google login error:", error);
-      toast.error("An error occurred while logging in with Google.");
-    }
+    await signIn("google", { callbackUrl: "/dashboard/student/upload" });
   };
 
   return (

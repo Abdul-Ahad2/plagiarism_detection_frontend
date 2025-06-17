@@ -5,8 +5,8 @@ import { BsGoogle } from "react-icons/bs";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import axios from "axios";
 import { toast, Toaster } from "sonner";
+import { signIn } from "next-auth/react";
 
 const dmSans_lighter = DM_Sans({
   subsets: ["latin"],
@@ -56,43 +56,18 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.email || !form.password) {
-      toast.error("Please enter both email and password.");
-      return;
-    }
+    const res = await signIn("credentials", {
+      redirect: false,
+      email: form.email,
+      password: form.password,
+      callbackUrl: `/dashboard/student/upload`,
+    });
+    if (res?.error) {
+      toast.error(res.error);
+    } else {
+      console.log("Login successful", res);
 
-    const backendUrl = process.env.NEXT_PUBLIC_API_BACKEND_URL;
-    if (!backendUrl) {
-      toast.error("Server URL is not configured.");
-      return;
-    }
-    const loginUrl = `${backendUrl}/api/v1/auth/login`;
-
-    const toastId = toast.loading("Signing in…");
-
-    try {
-      const response = await axios.post(loginUrl, {
-        email: form.email,
-        password: form.password,
-      });
-
-      const data = response.data;
-      localStorage.setItem("token", data.token);
-      console.log(data);
-
-      toast.success(`Welcome back, ${data.user.username}!`, { id: toastId });
-
-      const userRole = data.user.role;
-      router.push(`/dashboard/${userRole}/upload`);
-    } catch (error) {
-      console.error("Login error full:", error);
-
-      if (error.response) {
-        const serverMsg = error.response.data.error || "Login failed";
-        toast.error(serverMsg, { id: toastId });
-      } else {
-        toast.error("Network error. Please try again.", { id: toastId });
-      }
+      router.push(res.url || "/dashboard/student/upload");
     }
   };
 
@@ -172,9 +147,9 @@ export default function Login() {
 
             <button
               type="button"
-              onClick={() => {
-                window.location.href = `${process.env.NEXT_PUBLIC_API_BACKEND_URL}/api/v1/auth/google`;
-              }}
+              onClick={() =>
+                signIn("google", { callbackUrl: "/dashboard/student/upload" })
+              }
               className={`${dmSans_lightest.className} bg-gradient-to-l text-3xl from-purple-400 to-purple-900
                           text-gray-300 w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 flex items-center justify-center
                           gap-2 sm:gap-3`}

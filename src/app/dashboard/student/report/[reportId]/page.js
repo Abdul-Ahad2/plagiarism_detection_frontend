@@ -4,9 +4,11 @@
 import { useState, useEffect, useRef } from "react";
 import { DM_Sans, Raleway } from "next/font/google";
 import { PiArrowLeft, PiInfo } from "react-icons/pi";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
 import { useParams } from "next/navigation";
+import { toast } from "sonner";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -35,7 +37,8 @@ export default function DocumentAnalysisPage() {
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [activeTab, setActiveTab] = useState("all");
   const contentRef = useRef(null);
-  const { reportId } = useParams(); // destructure the dynamic segment
+  const pathname = usePathname();
+  const { reportId } = useParams();
 
   // Fetch report detail once on mount (when reportId is available)
   useEffect(() => {
@@ -43,15 +46,15 @@ export default function DocumentAnalysisPage() {
 
     const fetchDocument = async () => {
       try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_BACKEND_URL}/api/v1/reports/plagiarized-report/${reportId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-            },
-          }
-        );
-        const data = response.data.report[0];
+        // const response = await axios.get(
+        //   `${process.env.NEXT_PUBLIC_FASTAPI_URL}/reports/${reportId}`,
+        //   {
+        //     headers: {
+        //       Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+        //     },
+        //   }
+        // );
+        const data = JSON.parse(localStorage.getItem("report")); // now a single object, not an array
         console.log(data);
 
         setDocument({
@@ -179,7 +182,7 @@ export default function DocumentAnalysisPage() {
     <div className="min-h-screen bg-gradient-to-r from-black to-gray-900 text-gray-300 py-44">
       <div className="max-w-7xl mx-auto">
         <h1
-          className={`${rw.className} text-3xl md:text-8xl text-center mb-20`}
+          className={`${rw.className} text-3xl md:text-7xl text-center mb-20`}
         >
           Document{" "}
           <span className="text-transparent bg-gradient-to-r from-purple-300 to-purple-700 bg-clip-text">

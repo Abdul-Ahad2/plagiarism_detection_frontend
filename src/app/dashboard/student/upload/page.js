@@ -28,19 +28,10 @@ const rw_bold = Raleway({
 // For demo purposes, we’ll define them inline:
 
 async function postPlagiarismCheck(formData) {
-  const token = localStorage.getItem("token"); // or grab it from wherever you keep it
-  if (!token) throw new Error("No auth token found");
-
-  const response = await axios.post(
-    process.env.NEXT_PUBLIC_API_BASE_URL + "/plagiarism/check",
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+  // no need to grab token—cookie is sent automatically
+  const response = await axios.post("/api/report/check", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
   return response.data;
 }
 
@@ -105,7 +96,7 @@ export default function UploadPage() {
       // 1) Upload the file to /check-plagiarism (with token in headers)
       const res = await postPlagiarismCheck(formData);
       console.log(res);
-
+      localStorage.setItem("report", JSON.stringify(res));
       router.push("/dashboard/student/report/" + res.id);
     } catch (err) {
       console.error(err);

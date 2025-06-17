@@ -102,7 +102,7 @@ export default function Home() {
             <RotatingBox className="inline-block">
               <Link
                 href="/register"
-                className={`${rw_less_bold.className} px-10 py-8 text-center mt-4 text-gray-800 bg-gradient-to-r from-purple-300 to-purple-900 hover:to-emerald-400 text-2xl inline-flex items-center justify-center`}
+                className={`${rw_less_bold.className} px-10 py-8 text-center mt-4 text-gray-800 bg-gradient-to-r from-purple-300 to-purple-900 hover:to-emerald-400 text-2xl inline-flex items-center transition-colors duration-1000 ease-in-out justify-center`}
               >
                 Try It Now →
               </Link>

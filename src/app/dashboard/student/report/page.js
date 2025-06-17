@@ -1,5 +1,6 @@
 "use client";
-import { DM_Sans, Raleway } from "next/font/google";
+import { DM_Sans, Raleway, Inter } from "next/font/google";
+import Link from "next/link";
 import {
   PiMagnifyingGlass,
   PiTrash,
@@ -15,6 +16,11 @@ import axios from "axios";
 const dmSans = DM_Sans({
   subsets: ["latin"],
   weight: ["700"],
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["500"],
 });
 
 const rw = Raleway({
@@ -69,15 +75,9 @@ const mockReports = [
 export default function ReportsPage() {
   useEffect(() => {
     const fetchReports = async () => {
-      const response = await axios.get(
-        process.env.NEXT_PUBLIC_API_BACKEND_URL + "/api/v1/reports/get-reports",
-        {
-          headers: {
-            // Most APIs expect the header name "Authorization" with value "Bearer <token>"
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await axios.get("/api/report/get-reports");
+      console.log(response);
+
       setReports(response.data.reports);
       // Adjust the API endpoint as needed
     };
@@ -149,7 +149,7 @@ export default function ReportsPage() {
                 Total Checks
               </h3>
               <p
-                className={`${rw_bold.className} text-4xl md:text-5xl bg-gradient-to-r from-purple-200 to-purple-900 bg-clip-text text-transparent`}
+                className={`${inter.className} text-4xl md:text-5xl bg-gradient-to-r from-purple-200 to-purple-900 bg-clip-text text-transparent`}
               >
                 {totalReports}
               </p>
@@ -166,9 +166,9 @@ export default function ReportsPage() {
                 Avg Similarity
               </h3>
               <p
-                className={`${rw_bold.className} text-4xl md:text-5xl bg-gradient-to-r from-blue-200 to-blue-700 bg-clip-text text-transparent`}
+                className={`${inter.className} text-4xl md:text-5xl bg-gradient-to-r from-blue-200 to-blue-700 bg-clip-text text-transparent`}
               >
-                {avgSimilarity}%
+                {avgSimilarity == "NaN" ? 0 : avgSimilarity}%
               </p>
             </div>
           </div>
@@ -182,7 +182,7 @@ export default function ReportsPage() {
                 High Matches
               </h3>
               <p
-                className={`${rw_bold.className} text-4xl md:text-5xl bg-gradient-to-r from-red-100 to-red-800 bg-clip-text text-transparent`}
+                className={`${inter.className} text-4xl md:text-5xl bg-gradient-to-r from-red-100 to-red-800 bg-clip-text text-transparent`}
               >
                 {highSimilarityCount}
               </p>
@@ -267,12 +267,20 @@ export default function ReportsPage() {
                     >
                       {report.date} • {report.word_count.toLocaleString()} words
                     </p>
-                  </div>
+                  </div>{" "}
                   <button
-                    onClick={() =>
-                      setReports(reports.filter((r) => r.id !== report.id))
-                    }
                     className="text-gray-400 hover:text-red-400"
+                    onClick={async () => {
+                      try {
+                        await axios.delete(
+                          `/api/report/delete-report/${report.id}`
+                        );
+                        setReports(reports.filter((r) => r.id !== report.id));
+                      } catch (err) {
+                        console.error("Delete failed", err);
+                        alert("Could not delete report.");
+                      }
+                    }}
                   >
                     <PiTrash size={18} />
                   </button>
@@ -453,9 +461,13 @@ export default function ReportsPage() {
                       <span className={`${dmSans_light.className}`}>
                         {source}
                       </span>
-                      <button className="text-purple-400 hover:text-purple-300">
+                      <Link
+                        href={source}
+                        target="_blank"
+                        className="text-purple-400 hover:text-purple-300"
+                      >
                         <PiEye size={18} />
-                      </button>
+                      </Link>
                     </div>
                   ))}
                 </div>

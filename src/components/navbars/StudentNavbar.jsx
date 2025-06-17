@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation"; // ← import the router
+import { signOut } from "next-auth/react";
 
 const rw = Raleway({
   subsets: ["cyrillic", "latin"],
@@ -37,16 +38,10 @@ export default function Navbar() {
   const router = useRouter();
   const [isMenu, setIsMenu] = useState(false);
 
-  // ① This function runs when the user clicks “Logout”
   const handleLogout = () => {
-    // Remove the token (adjust the key name to whatever you used)
-    localStorage.removeItem("token");
-
-    // Optionally, clear any other user‐related state in localStorage:
-    // localStorage.removeItem("userRole");
-
-    // Redirect to /login
-    router.push("/login");
+    signOut({
+      callbackUrl: "/login",
+    });
   };
 
   return (
