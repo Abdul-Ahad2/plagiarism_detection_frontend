@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import "@/lib/mongodb";
-import { fetchPlagiarisedReport } from "@/service/report.service";
+import { fetchPlagiarisedReport } from "@/services/report.service";
 
 export async function GET(req, { params }) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
