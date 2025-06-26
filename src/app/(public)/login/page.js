@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast, Toaster } from "sonner";
 import { signIn } from "next-auth/react";
+import Grid from "@/components/Grid";
 
 const dmSans_lighter = DM_Sans({
   subsets: ["latin"],
@@ -56,6 +57,11 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!form.email || !form.password) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
+
     const res = await signIn("credentials", {
       redirect: false,
       email: form.email,
@@ -73,9 +79,11 @@ export default function Login() {
 
   return (
     <>
+      <title>Sign in - SleuthInk</title>
       {/* 3) Render the Toaster once */}
 
       <div className="flex items-center justify-center h-auto bg-gradient-to-r from-black to-gray-900 px-4 py-32 sm:px-6 lg:px-0">
+        <Grid height={120} />
         <div
           className={`w-full max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl text-center rounded-3xl lg:rounded-4xl
                       px-6 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12 shadow-lg lg:shadow-2xl text-gray-200
@@ -106,7 +114,12 @@ export default function Login() {
               name="email"
               type="email"
               value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  email: e.target.value.trim(),
+                })
+              }
               className={`${dmSans_lighter.className} text-base sm:text-lg lg:text-xl w-full
                           h-17 md:h-16 lg:h-20 p-3 sm:p-4 placeholder:text-gray-200
                           border-gray-200 border-b-[1px] focus:outline-none`}
@@ -138,9 +151,8 @@ export default function Login() {
 
             <button
               type="submit"
-              className={`${dmSans_lightest.className} text-3xl w-full h-17 md:h-16 lg:h-20
-                          p-3 sm:p-4 bg-gradient-to-r hover:bg-gradient-to-l hover:from-purple-900
-                          hover:to-purple-400 from-purple-400 to-purple-900 text-gray-300`}
+              className={`${dmSans_lightest.className} cursor-pointer text-3xl w-full h-17 md:h-16 lg:h-20
+                          p-3 sm:p-4 bg-gradient-to-r hover:bg-gradient-to-l transition-colors duration-300 hover:from-purple-700 hover:to-purple-900 from-purple-400 to-purple-900 text-gray-300`}
             >
               Login
             </button>
@@ -150,9 +162,9 @@ export default function Login() {
               onClick={() =>
                 signIn("google", { callbackUrl: "/dashboard/student/upload" })
               }
-              className={`${dmSans_lightest.className} bg-gradient-to-l text-3xl from-purple-400 to-purple-900
+              className={`${dmSans_lightest.className} cursor-pointer bg-gradient-to-l text-3xl from-purple-400 to-purple-900
                           text-gray-300 w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 flex items-center justify-center
-                          gap-2 sm:gap-3`}
+                          gap-2 sm:gap-3 transition-colors duration-300 hover:from-purple-700 hover:to-purple-900`}
             >
               <BsGoogle className="text-3xl" />
               <span>Sign in with Google</span>

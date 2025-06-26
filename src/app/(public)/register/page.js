@@ -7,6 +7,7 @@ import Link from "next/link";
 import axios from "axios";
 import { toast } from "sonner";
 import { signIn } from "next-auth/react";
+import Grid from "@/components/Grid";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -14,17 +15,17 @@ const dmSans = DM_Sans({
 });
 
 const dmSans_lighter = DM_Sans({
-  subsets: ["latin"],
+  subsets: ["latin-ext"],
   weight: ["400"],
 });
 
 const dmSans_lightest = DM_Sans({
-  subsets: ["latin-ext"],
+  subsets: ["latin"],
   weight: ["300"],
 });
 
 const rw = Raleway({
-  subsets: ["cyrillic"],
+  subsets: ["latin"],
   weight: ["400"],
 });
 
@@ -94,6 +95,8 @@ export default function Login() {
 
   return (
     <div className="flex items-center justify-center h-auto bg-gradient-to-r from-black to-gray-900 px-4 py-32 sm:px-6 lg:px-0 ">
+      <title>Sign up - SleuthInk</title>
+      <Grid height={170} />
       <div
         className={`w-full max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl text-center rounded-3xl lg:rounded-4xl px-6 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12 shadow-lg lg:shadow-2xl text-gray-200 ${
           isTouchDevice
@@ -119,7 +122,12 @@ export default function Login() {
           <input
             type="text"
             value={form.username}
-            onChange={(e) => setForm({ ...form, username: e.target.value })}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                username: e.target.value.trim(),
+              })
+            }
             name="username"
             className={`${dmSans_lighter.className} bg-transparent text-base sm:text-lg lg:text-xl w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 placeholder:text-gray-400 text-gray-200 border-gray-200 border-b-[1px] focus:outline-none focus:border-purple-400`}
             placeholder="Full Name"
@@ -127,7 +135,7 @@ export default function Login() {
           />
           <input
             value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            onChange={(e) => setForm({ ...form, email: e.target.value.trim() })}
             name="email"
             type="email"
             className={`${dmSans_lighter.className} bg-transparent text-base sm:text-lg lg:text-xl w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 placeholder:text-gray-400 text-gray-200 border-gray-200 border-b-[1px] focus:outline-none focus:border-purple-400`}
@@ -198,7 +206,7 @@ export default function Login() {
 
           <button
             type="submit"
-            className={`${dmSans_lightest.className} text-3xl w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 bg-gradient-to-r hover:bg-gradient-to-l hover:from-purple-900 hover:to-purple-400 from-purple-400 to-purple-900 text-gray-300 transition-all duration-300`}
+            className={`${dmSans_lightest.className} cursor-pointer text-3xl w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 bg-gradient-to-r hover:bg-gradient-to-l  from-purple-400 to-purple-900 text-gray-300 transition-colors duration-300 hover:from-purple-700 hover:to-purple-900`}
           >
             Register
           </button>
@@ -206,7 +214,7 @@ export default function Login() {
           <button
             type="button"
             onClick={handleGoogleAuth}
-            className={`${dmSans_lightest.className} bg-gradient-to-l text-3xl from-purple-400 to-purple-900 text-gray-300 w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 flex items-center justify-center gap-2 sm:gap-3 transition-all duration-300 hover:from-purple-500 hover:to-purple-800`}
+            className={`${dmSans_lightest.className} cursor-pointer  bg-gradient-to-l text-3xl from-purple-400 to-purple-900 text-gray-300 w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 flex items-center justify-center gap-2 sm:gap-3 transition-colors duration-300 hover:from-purple-700 hover:to-purple-900`}
           >
             <BsGoogle className="text-3xl" />
             <span>Sign up with Google</span>

@@ -6,10 +6,24 @@ import "@/lib/mongodb";
 import User from "@/models/user.model";
 
 const signupSchema = z.object({
-  username: z.string().min(3),
-  email: z.string().email(),
+  username: z.string().min(3, "Username must be at least 3 characters long."),
+  email: z.string().email("Please enter a valid email address."),
   role: z.enum(["student", "teacher", "researcher"]),
-  password: z.string().min(6),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters long.")
+    .max(100, "Password must be less than 100 characters.")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter.")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter.")
+    .regex(/\d/, "Password must contain at least one number.")
+    .regex(
+      /[!@#$%^&*(),.?":{}|<>]/,
+      "Password must contain at least one special character."
+    )
+    .refine(
+      (password) => !/\s/.test(password),
+      "Password cannot contain spaces."
+    ),
 });
 
 export async function POST(req) {
@@ -40,10 +54,17 @@ export async function POST(req) {
       },
       { status: 201 }
     );
-  } catch (err) {
+  } catch (error) {
+    if (error.name === "ZodError") {
+      // Return the first validation error
+      const firstError = error.errors[0];
+      return NextResponse.json({ error: firstError.message }, { status: 400 });
+    }
+
+    // Handle other errors
     return NextResponse.json(
-      { error: err.message || "Invalid data" },
-      { status: 400 }
+      { error: error.message || "Registration failed" },
+      { status: 500 }
     );
   }
 }

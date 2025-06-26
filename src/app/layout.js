@@ -2,6 +2,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/Footer";
+import AuthProvider from "@/components/AuthProvider";
+import Head from "next/head";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,10 +15,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata = {
-  title: "SluethInk - Plagiarism Detector",
-  description: "Plagiarism Detection Application",
-};
+// export const metadata = {
+//   icons: {
+//     icon: "/icon-website.png",
+//     shortcut: "/icon-website.png",
+//   },
+// };
 
 export default function RootLayout({ children }) {
   return (
@@ -24,7 +28,7 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <AuthProvider>{children}</AuthProvider>
         <Footer />
       </body>
     </html>

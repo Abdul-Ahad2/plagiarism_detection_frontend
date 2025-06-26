@@ -12,6 +12,10 @@ import {
 } from "react-icons/pi";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { toast } from "sonner";
+import { format } from "date-fns";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -37,40 +41,6 @@ const dmSans_light = DM_Sans({
   subsets: ["latin"],
   weight: ["500"],
 });
-
-// Mock report data
-const mockReports = [
-  {
-    id: 1,
-    title: "Research Paper.pdf",
-    date: "2023-11-15",
-    similarity: 100,
-    sources: ["arXiv", "CORE", "Wikipedia"],
-    word_count: 5240,
-    time_spent: "2 min 45 sec",
-    flagged: true,
-  },
-  {
-    id: 2,
-    title: "Literature Review.docx",
-    date: "2023-11-10",
-    similarity: 45,
-    sources: ["PubMed", "DOAJ"],
-    wordCount: 3120,
-    time_spent: "1 min 58 sec",
-    flagged: false,
-  },
-  {
-    id: 3,
-    title: "Thesis Draft.pdf",
-    date: "2023-11-05",
-    similarity: 12,
-    sources: ["CORE", "Wikipedia"],
-    wordCount: 8920,
-    time_spent: "4 min 12 sec",
-    flagged: false,
-  },
-];
 
 export default function ReportsPage() {
   useEffect(() => {
@@ -107,7 +77,95 @@ export default function ReportsPage() {
       report.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-  // Sort reports
+  const formatDate = (isoDate) => {
+    return format(new Date(isoDate), "MMMM d, yyyy, h:mm a");
+  };
+
+  const handleDownload = (report) => {
+    try {
+      const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "pt",
+        format: "a4",
+      });
+      const { width, height } = doc.internal.pageSize;
+
+      doc.setFillColor(30, 30, 30);
+      doc.rect(0, 0, width, height, "F");
+
+      const centerX = width / 2;
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(26);
+      doc.setTextColor(120, 80, 255);
+      doc.text("Sluethink Report", centerX, 50, { align: "center" });
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(14);
+      doc.setTextColor(180, 180, 180);
+      doc.text(report.name || `Report-${report.id}`, centerX, 70, {
+        align: "center",
+      });
+
+      autoTable(doc, {
+        startY: 80,
+        head: [[{ content: "Report Details", colSpan: 2 }]],
+        body: [
+          [
+            "Date",
+            report.date ? format(new Date(report.date), "MMMM d, yyyy") : "N/A",
+          ],
+          [
+            "Similarity",
+            report.similarity != null ? `${report.similarity}%` : "N/A",
+          ],
+          ["Word Count", report.word_count?.toLocaleString() || "N/A"],
+          ["Time Spent", report.time_spent || "N/A"],
+          ["Sources", report.sources?.join(", ") || "N/A"],
+          ["Flagged", report.flagged ? "Yes" : "No"],
+        ],
+        theme: "grid",
+        headStyles: {
+          fillColor: [120, 80, 255],
+          textColor: [255, 255, 255],
+          fontStyle: "bold",
+          fontSize: 12,
+          halign: "center",
+        },
+        styles: {
+          font: "helvetica",
+          fontSize: 10,
+          textColor: [220, 220, 220],
+          fillColor: [50, 50, 50],
+          lineColor: [100, 100, 100],
+          lineWidth: 0.5,
+        },
+        columnStyles: {
+          0: { cellWidth: 150, fontStyle: "bold" },
+          1: { cellWidth: 350 },
+        },
+        margin: { left: 40, right: 40 },
+      });
+
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text(
+        `Generated on ${format(new Date(), "MMMM d, yyyy, h:mm a")}`,
+        40,
+        height - 20
+      );
+
+      const baseName = report.title
+        ? report.title.replace(/\.[^/.]+$/, "")
+        : `report-${report.id}`;
+      doc.save(`${baseName}.pdf`);
+
+      toast.success("Report downloaded successfully");
+    } catch (error) {
+      console.error("Download failed:", error);
+      toast.error("Failed to download report");
+    }
+  };
+
   const sortedReports = [...filteredReports].sort((a, b) => {
     if (sortBy === "newest") return new Date(b.date) - new Date(a.date);
     if (sortBy === "oldest") return new Date(a.date) - new Date(b.date);
@@ -119,6 +177,7 @@ export default function ReportsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-r from-black to-gray-900 text-gray-300 py-44 px-52">
       {/* Main Container */}
+      <title>Your Reports - SleuthInk</title>
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-12">
@@ -141,7 +200,7 @@ export default function ReportsPage() {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-12 px-40">
           {/* Total Checks Card */}
-          <div className="bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center  border border-gray-700 p-6 text-center h-48 transition-transform hover:scale-105 ">
+          <div className="bg-gradient-to-br rounded-md from-gray-800 to-gray-900 flex items-center justify-center  border border-gray-700 p-6 text-center h-50 transition-transform hover:scale-105 ">
             <div>
               <h3
                 className={`${dmSans_light.className} text-gray-400 mb-2 text-base md:text-lg`}
@@ -149,7 +208,7 @@ export default function ReportsPage() {
                 Total Checks
               </h3>
               <p
-                className={`${inter.className} text-4xl md:text-5xl bg-gradient-to-r from-purple-200 to-purple-900 bg-clip-text text-transparent`}
+                className={`${dmSans_light.className} text-4xl md:text-5xl bg-gradient-to-r from-purple-200 to-purple-900 bg-clip-text text-transparent`}
               >
                 {totalReports}
               </p>
@@ -157,7 +216,7 @@ export default function ReportsPage() {
           </div>
 
           {/* Avg Similarity Card */}
-          <div className="bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center h-48 border border-gray-700 p-6 text-center transition-transform hover:scale-105 ">
+          <div className="bg-gradient-to-br rounded-md from-gray-800 to-gray-900 flex items-center justify-center h-50 border border-gray-700 p-6 text-center transition-transform hover:scale-105 ">
             <div>
               {" "}
               <h3
@@ -166,7 +225,7 @@ export default function ReportsPage() {
                 Avg Similarity
               </h3>
               <p
-                className={`${inter.className} text-4xl md:text-5xl bg-gradient-to-r from-blue-200 to-blue-700 bg-clip-text text-transparent`}
+                className={`${dmSans_light.className} text-4xl md:text-5xl bg-gradient-to-r from-blue-200 to-blue-700 bg-clip-text text-transparent`}
               >
                 {avgSimilarity == "NaN" ? 0 : avgSimilarity}%
               </p>
@@ -174,7 +233,7 @@ export default function ReportsPage() {
           </div>
 
           {/* High Matches Card */}
-          <div className="bg-gradient-to-br from-gray-800 to-gray-900 h-48 flex justify-center items-center border border-gray-700 p-6 text-center transition-transform hover:scale-105 ">
+          <div className="bg-gradient-to-br from-gray-800 to-gray-900 h-50 rounded-md flex justify-center items-center border border-gray-700 p-6 text-center transition-transform hover:scale-105 ">
             <div>
               <h3
                 className={`${dmSans_light.className} text-gray-400 mb-2 text-base md:text-lg`}
@@ -182,7 +241,7 @@ export default function ReportsPage() {
                 High Matches
               </h3>
               <p
-                className={`${inter.className} text-4xl md:text-5xl bg-gradient-to-r from-red-100 to-red-800 bg-clip-text text-transparent`}
+                className={`${dmSans_light.className} text-4xl md:text-5xl bg-gradient-to-r from-red-100 to-red-800 bg-clip-text text-transparent`}
               >
                 {highSimilarityCount}
               </p>
@@ -199,7 +258,7 @@ export default function ReportsPage() {
               <input
                 type="text"
                 placeholder="Search documents..."
-                className={`${rw.className} w-full pl-12 pr-6 py-3 bg-gray-800 rounded-lg border border-gray-700 focus:border-purple-500 focus:outline-none text-gray-300`}
+                className={`${rw.className} w-full pl-12 pr-6 py-3 bg-gray-800 rounded-md border border-gray-700 focus:border-purple-500 focus:outline-none text-gray-300`}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -208,9 +267,9 @@ export default function ReportsPage() {
             {/* Filter and Sort Controls */}
             <div className="flex flex-wrap gap-4 items-center">
               <div className="flex items-center gap-2">
-                <PiFunnel className="text-white text-xl" />
+                <PiFunnel className="text-gray-500 text-xl" />
                 <select
-                  className={`${rw.className} bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 text-gray-300 focus:border-purple-500 focus:outline-none`}
+                  className={`${dmSans_light.className} bg-gray-800 px-4 py-2 rounded-md border border-gray-700 text-gray-300 focus:border-purple-500 focus:outline-none`}
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
                 >
@@ -224,7 +283,7 @@ export default function ReportsPage() {
               <div className="flex gap-2">
                 <button
                   onClick={() => setActiveTab("all")}
-                  className={`${rw.className} px-4 py-2 rounded-lg ${
+                  className={`${dmSans_light.className} px-4 py-2 rounded-md ${
                     activeTab === "all"
                       ? "bg-gradient-to-r from-purple-400 to-purple-600 text-white"
                       : "bg-gray-800 text-gray-400 hover:bg-gray-700"
@@ -234,7 +293,7 @@ export default function ReportsPage() {
                 </button>
                 <button
                   onClick={() => setActiveTab("flagged")}
-                  className={`${rw.className} px-4 py-2 rounded-lg ${
+                  className={`${dmSans_light.className} px-4 py-2 rounded-md ${
                     activeTab === "flagged"
                       ? "bg-gradient-to-r from-red-400 to-red-800 text-white"
                       : "bg-gray-800 text-gray-400 hover:bg-gray-700"
@@ -248,37 +307,39 @@ export default function ReportsPage() {
         </div>
 
         {/* Reports Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 ">
           {sortedReports.map((report) => (
             <div
               key={report.id}
-              className="bg-gradient-to-br h-80 from-gray-800 to-gray-900 border border-gray-700 overflow-hidden"
+              className="bg-gradient-to-br h-80 rounded-md from-gray-800 to-gray-900 border border-gray-700 overflow-hidden"
             >
               <div className="p-6">
                 <div className="flex justify-between items-center mb-13">
                   <div>
                     <h3
-                      className={`${rw_bold.className} text-xl text-white mb-1`}
+                      className={`${dmSans_light.className} text-2xl text-white mb-1`}
                     >
                       {report.name}
                     </h3>
                     <p
                       className={`${dmSans_light.className} text-gray-400 text-sm`}
                     >
-                      {report.date} • {report.word_count.toLocaleString()} words
+                      {formatDate(report.date)} •{" "}
+                      {report.word_count.toLocaleString()} words
                     </p>
                   </div>{" "}
                   <button
-                    className="text-gray-400 hover:text-red-400"
+                    className="text-gray-400 hover:text-red-400 cursor-pointer"
                     onClick={async () => {
                       try {
                         await axios.delete(
                           `/api/report/delete-report/${report.id}`
                         );
                         setReports(reports.filter((r) => r.id !== report.id));
+                        toast.success("Report deleted successfully.");
                       } catch (err) {
                         console.error("Delete failed", err);
-                        alert("Could not delete report.");
+                        toast.error("Could not delete report.");
                       }
                     }}
                   >
@@ -292,7 +353,7 @@ export default function ReportsPage() {
                       Similarity
                     </span>
                     <span
-                      className={`${rw_bold.className} ${
+                      className={`${dmSans_light.className} ${
                         report.similarity > 70
                           ? "text-red-400"
                           : report.similarity > 30
@@ -331,14 +392,9 @@ export default function ReportsPage() {
                 <div className="flex gap-3 mt-12">
                   <button
                     onClick={() => setViewingReport(report)}
-                    className={`${rw.className} flex-1 py-2 bg-gradient-to-r from-gray-700 to-gray-800 rounded-lg text-gray-300 hover:from-gray-600 hover:to-gray-700 flex items-center justify-center gap-2`}
+                    className={`${dmSans_light.className} flex-1 py-2 bg-gradient-to-r cursor-pointer from-purple-400 to-purple-800 rounded-md text-gray-300 hover:from-gray-600 hover:to-gray-700 flex items-center justify-center gap-2`}
                   >
                     <PiEye size={16} /> View
-                  </button>
-                  <button
-                    className={`${rw.className} flex-1 py-2 bg-gradient-to-r from-purple-300 to-purple-700 rounded-lg text-gray-800 hover:from-purple-700 hover:to-purple-800 flex items-center justify-center gap-2`}
-                  >
-                    <PiDownload size={16} /> Download
                   </button>
                 </div>
               </div>
@@ -358,16 +414,16 @@ export default function ReportsPage() {
         {/* Report Detail Modal */}
         {viewingReport && (
           <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-            <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl border border-gray-700 p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl border border-gray-700 p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <h2
-                    className={`${rw_bold.className} text-2xl md:text-3xl text-white mb-1`}
+                    className={`${dmSans_light.className} text-2xl md:text-3xl text-white mb-1`}
                   >
                     {viewingReport.name}
                   </h2>
                   <p className={`${dmSans_light.className} text-gray-400`}>
-                    Analyzed on {viewingReport.date} •{" "}
+                    Analyzed on {formatDate(viewingReport.date)} •{" "}
                     {viewingReport.word_count.toLocaleString()} words
                   </p>
                 </div>
@@ -380,13 +436,15 @@ export default function ReportsPage() {
               </div>
 
               {/* Similarity Score */}
-              <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 mb-6">
+              <div className="bg-gray-800 p-6 rounded-md border border-gray-700 mb-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className={`${rw_bold.className} text-xl text-white`}>
+                  <h3
+                    className={`${dmSans_light.className} text-xl text-white`}
+                  >
                     Similarity Score
                   </h3>
                   <span
-                    className={`text-2xl font-bold ${
+                    className={`text-2xl font-bold ${dmSans_light.className} ${
                       viewingReport.similarity > 70
                         ? "text-red-400"
                         : viewingReport.similarity > 30
@@ -421,10 +479,10 @@ export default function ReportsPage() {
               {/* Details Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                 {/* Processing Time */}
-                <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <div className="bg-gray-800 p-4 rounded-md border border-gray-700">
                   <div className="flex items-center gap-3 mb-2">
                     <PiClock size={20} className="text-purple-400" />
-                    <h4 className={`${rw_bold.className} text-white`}>
+                    <h4 className={`${dmSans_light.className} text-white`}>
                       Processing Time
                     </h4>
                   </div>
@@ -434,10 +492,10 @@ export default function ReportsPage() {
                 </div>
 
                 {/* Sources Checked */}
-                <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <div className="bg-gray-800 p-4 rounded-md border border-gray-700 overflow-y-auto">
                   <div className="flex items-center gap-3 mb-2">
                     <PiInfo size={20} className="text-blue-400" />
-                    <h4 className={`${rw_bold.className} text-white`}>
+                    <h4 className={`${dmSans_light.className} text-white`}>
                       Sources Checked
                     </h4>
                   </div>
@@ -449,14 +507,16 @@ export default function ReportsPage() {
 
               {/* Matched Sources */}
               <div className="mb-8">
-                <h3 className={`${rw_bold.className} text-xl text-white mb-4`}>
+                <h3
+                  className={`${dmSans_light.className} text-xl text-white mb-4`}
+                >
                   Matched Sources
                 </h3>
                 <div className="space-y-3">
                   {viewingReport.sources.map((source, index) => (
                     <div
                       key={index}
-                      className="bg-gray-800 p-4 rounded-lg border border-gray-700 flex justify-between items-center"
+                      className="bg-gray-800 p-4 rounded-md border border-gray-700 flex justify-between items-center"
                     >
                       <span className={`${dmSans_light.className}`}>
                         {source}
@@ -476,14 +536,10 @@ export default function ReportsPage() {
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <button
-                  className={`${rw_bold.className} px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg text-white flex items-center justify-center gap-2 hover:from-blue-600 hover:to-blue-700 transition`}
+                  onClick={() => handleDownload(viewingReport)}
+                  className={`${dmSans_light.className} px-6 py-3 bg-gradient-to-r from-purple-400 to-purple-800 rounded-md cursor-pointer text-gray-300 flex items-center justify-center gap-2 hover:from-purple-600 hover:to-purple-700 transition`}
                 >
                   <PiDownload size={18} /> Download Report
-                </button>
-                <button
-                  className={`${rw_bold.className} px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg text-white hover:from-purple-600 hover:to-purple-700 transition`}
-                >
-                  View Detailed Analysis
                 </button>
               </div>
             </div>

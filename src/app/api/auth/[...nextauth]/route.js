@@ -17,22 +17,36 @@ export const authOptions = {
         password: { type: "password" },
       },
       async authorize(creds) {
-        const { email, password } = z
-          .object({ email: z.string().email(), password: z.string().min(6) })
-          .parse(creds);
+        try {
+          const { email, password } = z
+            .object({
+              email: z.string().email("Please enter a valid email address."),
+              password: z.string(),
+            })
+            .parse(creds);
 
-        const user = await User.findOne({ email });
-        if (!user) throw new Error("No user found");
-        if (!(await bcrypt.compare(password, user.password)))
-          throw new Error("Invalid credentials");
+          const user = await User.findOne({ email });
+          if (!user) throw new Error("No user found. Please register first.");
+          if (!(await bcrypt.compare(password, user.password)))
+            throw new Error("Invalid credentials. Please try again.");
 
-        return {
-          id: user._id.toString(),
-          email: user.email,
-          role: user.role,
-          name: user.name,
-          image: user.image,
-        };
+          return {
+            id: user._id.toString(),
+            email: user.email,
+            role: user.role,
+            name: user.name,
+            image: user.image,
+          };
+        } catch (error) {
+          if (error.name === "ZodError") {
+            // Get the first error message only
+            const firstError = error.errors[0];
+            throw new Error(firstError.message);
+          }
+
+          // Handle other errors
+          throw new Error(error.message);
+        }
       },
     }),
 

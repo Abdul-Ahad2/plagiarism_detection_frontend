@@ -1,8 +1,10 @@
 "use client";
 import { LiaSearchSolid } from "react-icons/lia";
+import CustomCursor from "@/components/CustomCursor";
 import Link from "next/link";
 import RotatingBox from "@/components/RotatingBox";
 import { Berkshire_Swash, DM_Sans, Raleway } from "next/font/google";
+import Grid from "@/components/Grid";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -42,24 +44,22 @@ const rw_less_bold = Raleway({
 export default function Home() {
   return (
     <>
-      <div className="selection:bg-gray-500 selection:text-white">
-        {/* hero-section */}
-
-        <div className="w-full h-screen bg-gradient-to-r from-black to-gray-900 text-gray-300 flex items-center justify-center border-black ">
-          <div className="text-center px-4">
-            <h2 className={`${rw.className} text-3xl mb-20 tracking-[15px]`}>
-              INTRODUCING
-            </h2>
-            <h1
-              className={`${bs.className} text-7xl md:text-8xl lg:text-9xl xl:text-[16rem] tracking-tighter leading-tight drop-shadow-[0_5px_15px_rgba(255,255,255,0.3)]
-          `}
-            >
-              SleuthInk.
-            </h1>
-            <h2 className={`${rw.className}  text-3xl mt-20 tracking-[15px]`}>
-              POWERFUL PLAGIARISM DETECTION
-            </h2>
-          </div>
+      <title>SleuthInk - Plagiarism Detection</title>
+      <Grid height={550} />
+      {/* <CustomCursor /> */}
+      <div className="w-full h-screen bg-gradient-to-r from-black to-gray-900 text-gray-300 flex items-center justify-center border-black relative overflow-hidden">
+        <div className="text-center px-4 relative z-10">
+          <h2 className={`${rw.className} text-3xl mb-20 tracking-[15px]`}>
+            INTRODUCING
+          </h2>
+          <h1
+            className={`${bs.className} text-7xl md:text-8xl lg:text-9xl xl:text-[16rem] tracking-tighter leading-tight drop-shadow-[0_5px_15px_rgba(255,255,255,0.3)]`}
+          >
+            SleuthInk.
+          </h1>
+          <h2 className={`${rw.className} text-3xl mt-20 tracking-[15px]`}>
+            POWERFUL PLAGIARISM DETECTION
+          </h2>
         </div>
       </div>
       {/* <div
@@ -80,36 +80,86 @@ export default function Home() {
               className={`${rw.className} text-4xl md:text-5xl lg:text-8xl mb-6 md:mb-8 lg:mb-10 tracking-tighter leading-tight`}
             >
               Your Partner in{" "}
-              <span className="bg-gradient-to-r from-purple-200 to-purple-800 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-purple-300  via-purple-500 to-purple-300 bg-clip-text text-transparent">
                 Academic Integrity
               </span>
             </h1>
 
             <p
-              className={`${dmSans_lighter.className} text-lg md:text-xl lg:text-4xl mb-8 text-gray-300`}
+              className={`${dmSans_lighter.className}  text-lg md:text-xl lg:text-4xl mb-8 text-gray-300`}
             >
               SleuthInk stands out with cutting-edge plagiarism detection
               tailored for students, teachers, and researchers. Our platform
               leverages AI to deliver precise, real-time results, surpassing
               free tools in{" "}
-              <span className="bg-gradient-to-r from-purple-200 to-purple-800 bg-clip-text text-transparent px-1  ">
+              <span className="bg-gradient-to-r from-purple-300 to-purple-600 bg-clip-text text-transparent px-1  ">
                 accuracy and reliability
               </span>
               . With a focus on privacy and ease of use, SleuthInk helps you
               maintain originality in assignments, grading, and research.
             </p>
 
-            <RotatingBox className="inline-block">
-              <Link
-                href="/register"
-                className={`${rw_less_bold.className} px-10 py-8 text-center mt-4 text-gray-800 bg-gradient-to-r from-purple-300 to-purple-900 hover:to-emerald-400 text-2xl inline-flex items-center transition-colors duration-1000 ease-in-out justify-center`}
-              >
-                Try It Now →
-              </Link>
-            </RotatingBox>
+            <Link
+              href="/register"
+              className={`${rw_less_bold.className} px-12 py-10 text-center mt-4 text-purple-200 bg-gradient-to-r from-purple-700 to-purple-400 hover:to-purple-500 hover:from-purple-900 hover:text-gray-300 text-2xl inline-flex items-center transition-colors duration-700 ease-in-out justify-center`}
+            >
+              Try It Now →
+            </Link>
+          </div>
+        </div>
+        <div className="w-full lg:w-1/3 flex items-center justify-center p-8">
+          <div className="relative w-80 h-80">
+            {/* Outer rotating ring */}
+            <div
+              className="absolute inset-0 rounded-full border border-gray-400/30 animate-spin"
+              style={{ animationDuration: "20s" }}
+            >
+              <div className="absolute top-0 left-1/2 w-2 h-2 bg-white rounded-full transform -translate-x-1/2 -translate-y-1"></div>
+            </div>
+
+            {/* Middle rotating ring - opposite direction */}
+            <div
+              className="absolute inset-4 rounded-full border border-gray-600/50 animate-spin"
+              style={{
+                animationDuration: "15s",
+                animationDirection: "reverse",
+              }}
+            >
+              <div className="absolute top-0 left-1/2 w-1.5 h-1.5 bg-white rounded-full transform -translate-x-1/2 -translate-y-1"></div>
+            </div>
+
+            <div
+              className="absolute top-16 right-16 w-3 h-3 bg-white rotate-45 animate-pulse"
+              style={{ animationDelay: "0s" }}
+            ></div>
+            <div
+              className="absolute bottom-20 left-12 w-2 h-2 bg-gray-500 rounded-full animate-pulse"
+              style={{ animationDelay: "1s" }}
+            ></div>
+
+            {/* Central icon area */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="relative">
+                {/* Subtle glow behind icon */}
+                <div className="absolute inset-0 bg-white/5 rounded-full blur-md scale-150"></div>
+
+                {/* Modern search/scan icon using CSS */}
+                <div className="relative w-16 h-16 flex items-center justify-center">
+                  <div className="absolute w-10 h-10 border-2 border-gray-300/40 rounded-full"></div>
+                  <div className="absolute w-6 h-0.5 bg-gray-300/40 rotate-45 translate-x-6 translate-y-5"></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Subtle corner accents */}
+            <div className="absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 border-gray-300/40"></div>
+            <div className="absolute top-0 right-0 w-8 h-8 border-r-2 border-t-2 border-gray-300/40"></div>
+            <div className="absolute bottom-0 left-0 w-8 h-8 border-l-2 border-b-2 border-gray-300/40"></div>
+            <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-gray-300/40"></div>
           </div>
         </div>
       </div>
+
       {/* how-it-works */}
 
       {/* detection-methods */}
@@ -118,7 +168,7 @@ export default function Home() {
         className="w-full h-[35vh] bg-gradient-to-r from-black to-gray-900  flex items-center justify-center"
       >
         <h1
-          className={`${rw.className} text-center text-4xl md:text-5xl lg:text-[10rem] tracking-tighter bg-gradient-to-r from-purple-300 to-purple-900 bg-clip-text text-transparent p-1`}
+          className={`${rw.className} text-center text-4xl md:text-5xl lg:text-[10rem] tracking-tighter bg-gradient-to-r from-purple-300  via-purple-500 to-purple-300 bg-clip-text text-transparent p-1`}
         >
           Detection Methods
         </h1>
@@ -219,14 +269,14 @@ export default function Home() {
         className="w-full h-[35vh] bg-gradient-to-r from-black to-gray-900  flex items-center justify-center pt-20"
       >
         <h1
-          className={`${rw.className} text-center text-4xl md:text-5xl lg:text-[10rem] tracking-tighter bg-gradient-to-r from-purple-300 to-purple-900 bg-clip-text text-transparent p-1`}
+          className={`${rw.className} text-center text-4xl md:text-5xl lg:text-[10rem] tracking-tighter bg-gradient-to-r from-purple-300  via-purple-500 to-purple-300 bg-clip-text text-transparent p-1`}
         >
           Privacy & Ethics
         </h1>
       </div>
       <div className="h-auto p-20 w-full bg-gradient-to-r from-black to-gray-900 flex items-center justify-center">
         <div className="text-gray-200 text-center mb-20  px-56">
-          <div>
+          <div className="mb-20">
             <div className={`${rw_less_bold.className} text-6xl `}>
               Locked Tight
             </div>
@@ -240,7 +290,7 @@ export default function Home() {
               </span>
             </h1>
           </div>
-          <div>
+          <div className="mb-20">
             <div className={`${rw_less_bold.className} text-6xl mt-10`}>
               Gone in a Flash
             </div>
