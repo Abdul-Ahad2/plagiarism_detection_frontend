@@ -17,10 +17,10 @@ export default function CustomCursor() {
     <div
       className="fixed pointer-events-none z-40"
       style={{
-        left: mousePosition.x - 200,
-        top: mousePosition.y - 200,
-        width: "400px",
-        height: "400px",
+        left: mousePosition.x - 100,
+        top: mousePosition.y - 100,
+        width: "200px",
+        height: "200px",
         background: "white",
         borderRadius: "50%",
         mixBlendMode: "difference",

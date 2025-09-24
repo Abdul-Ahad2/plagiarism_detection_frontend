@@ -41,16 +41,7 @@ export default function DocumentAnalysisPage() {
 
     const fetchDocument = async () => {
       try {
-        // const response = await axios.get(
-        //   `${process.env.NEXT_PUBLIC_FASTAPI_URL}/reports/${reportId}`,
-        //   {
-        //     headers: {
-        //       Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-        //     },
-        //   }
-        // );
         const data = JSON.parse(localStorage.getItem("report")); // now a single object, not an array
-        console.log(data);
 
         setDocument({
           name: data.name || "",
@@ -58,7 +49,7 @@ export default function DocumentAnalysisPage() {
           plagiarismData: Array.isArray(data.plagiarism_data)
             ? data.plagiarism_data.map((item) => ({
                 text: item.matched_text,
-                similarity: (item.similarity * 100).toFixed(2), // e.g. 0.87 → "87.00"
+                similarity: item.similarity.toFixed(2) * 100, // e.g. 0.87 → "87.00"
                 source: item.source_title,
                 url: item.source_url,
               }))

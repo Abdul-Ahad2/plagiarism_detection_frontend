@@ -1,21 +1,24 @@
-// src/components/ClearReportCache.jsx
 "use client";
 
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
+import { useSession } from "next-auth/react";
 
-/**
- * Clears the "report" key from localStorage whenever
- * the path stops matching /dashboard/student/report/[id].
- */
 export default function ClearReportCache() {
+  const { data: session } = useSession();
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!pathname.startsWith("/dashboard/student/report/")) {
+    if (!session?.user?.name) return; // <-- guard
+
+    const currentPath = `/dashboard/student/${session.user.name
+      .toLowerCase()
+      .replace(" ", "-")}/report/`;
+
+    if (!pathname.startsWith(currentPath) && localStorage.getItem("report")) {
       localStorage.removeItem("report");
     }
-  }, [pathname]);
+  }, [pathname, session]);
 
   return null;
 }

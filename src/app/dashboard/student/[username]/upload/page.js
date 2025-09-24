@@ -7,9 +7,9 @@ import { LiaCloudUploadAltSolid } from "react-icons/lia";
 import { FiFile, FiX } from "react-icons/fi";
 import RotatingBox from "@/components/RotatingBox";
 import { DM_Sans, Raleway } from "next/font/google";
-import axios from "axios"; // <-- make sure axios is installed
+import axios from "axios";
 import Grid from "@/components/Grid";
-import Head from "next/head";
+import { useSession } from "next-auth/react";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -35,6 +35,7 @@ async function postPlagiarismCheck(formData) {
 }
 
 export default function UploadPage() {
+  const { data: session, status } = useSession();
   const router = useRouter();
   const [file, setFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -94,9 +95,16 @@ export default function UploadPage() {
 
       // 1) Upload the file to /check-plagiarism (with token in headers)
       const res = await postPlagiarismCheck(formData);
-      console.log(res);
+
       localStorage.setItem("report", JSON.stringify(res));
-      router.push("/dashboard/student/report/" + res.id);
+      console.log("saves");
+      setTimeout(() => {
+        router.push(
+          `/dashboard/student/${session.user.name
+            .toLowerCase()
+            .replace(" ", "-")}/report/${res.id}`
+        );
+      }, 10000);
     } catch (err) {
       console.error(err);
       setError("An error occurred during upload. Try again later.");

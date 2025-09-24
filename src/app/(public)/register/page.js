@@ -8,6 +8,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { signIn } from "next-auth/react";
 import Grid from "@/components/Grid";
+import { useSession } from "next-auth/react";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -40,6 +41,27 @@ export default function Login() {
     password: "",
     confirmPassword: "", // Added this field
   });
+  const { data: session, status } = useSession();
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      if (session.user.role === "teacher") {
+        router.push(
+          `/dashboard/teacher/${session.user.name
+            .toLowerCase()
+            .split(" ")
+            .join("-")}`
+        );
+      } else if (session.user.role === "student") {
+        router.push(
+          `/dashboard/student/${session.user.name
+            .toLowerCase()
+            .split(" ")
+            .join("-")}`
+        );
+      }
+    }
+  }, [status, session]);
 
   useEffect(() => {
     // Check if touch device
@@ -73,7 +95,7 @@ export default function Login() {
 
     try {
       await axios.post(`/api/auth/register`, {
-        username: form.username,
+        username: form.username.trim(),
         email: form.email,
         role: form.role,
         password: form.password,
@@ -88,9 +110,13 @@ export default function Login() {
       console.log(error.response.data.error);
     }
   };
-
-  const handleGoogleAuth = async () => {
-    await signIn("google", { callbackUrl: "/dashboard/student/upload" });
+  const handleGoogleLogin = async () => {
+    const res = await signIn("google", {
+      redirect: false,
+    });
+    if (res?.error) {
+      toast.error(res.error);
+    }
   };
 
   return (
@@ -125,7 +151,7 @@ export default function Login() {
             onChange={(e) =>
               setForm({
                 ...form,
-                username: e.target.value.trim(),
+                username: e.target.value,
               })
             }
             name="username"
@@ -213,7 +239,7 @@ export default function Login() {
 
           <button
             type="button"
-            onClick={handleGoogleAuth}
+            onClick={handleGoogleLogin}
             className={`${dmSans_lightest.className} cursor-pointer  bg-gradient-to-l text-3xl from-purple-400 to-purple-900 text-gray-300 w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 flex items-center justify-center gap-2 sm:gap-3 transition-colors duration-300 hover:from-purple-700 hover:to-purple-900`}
           >
             <BsGoogle className="text-3xl" />

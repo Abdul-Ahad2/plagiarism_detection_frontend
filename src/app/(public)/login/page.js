@@ -6,8 +6,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast, Toaster } from "sonner";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import Grid from "@/components/Grid";
+import { useSession } from "next-auth/react";
 
 const dmSans_lighter = DM_Sans({
   subsets: ["latin"],
@@ -26,6 +27,7 @@ const rw = Raleway({
 
 export default function Login() {
   const router = useRouter();
+  const { data: session, status } = useSession();
 
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
   const [isTouchDevice, setIsTouchDevice] = useState(false);
@@ -34,6 +36,26 @@ export default function Login() {
     email: "",
     password: "",
   });
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      if (session.user.role === "teacher") {
+        router.push(
+          `/dashboard/teacher/${session.user.name
+            .toLowerCase()
+            .split(" ")
+            .join("-")}`
+        );
+      } else if (session.user.role === "student") {
+        router.push(
+          `/dashboard/student/${session.user.name
+            .toLowerCase()
+            .split(" ")
+            .join("-")}`
+        );
+      }
+    }
+  }, [status, session]);
 
   useEffect(() => {
     setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
@@ -54,6 +76,15 @@ export default function Login() {
     };
   }, [isTouchDevice]);
 
+  const handleGoogleLogin = async () => {
+    const res = await signIn("google", {
+      redirect: false,
+    });
+    if (res?.error) {
+      toast.error(res.error);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -66,14 +97,30 @@ export default function Login() {
       redirect: false,
       email: form.email,
       password: form.password,
-      callbackUrl: `/dashboard/student/upload`,
     });
     if (res?.error) {
       toast.error(res.error);
     } else {
       console.log("Login successful", res);
 
-      router.push(res.url || "/dashboard/student/upload");
+      const session = await getSession();
+      const role = session?.user?.role;
+
+      if (role === "teacher") {
+        router.push(
+          `/dashboard/teacher/${session.user.name
+            .toLowerCase()
+            .split(" ")
+            .join("-")}`
+        );
+      } else {
+        router.push(
+          `/dashboard/student/${session.user.name
+            .toLowerCase()
+            .split(" ")
+            .join("-")}`
+        );
+      }
     }
   };
 
@@ -159,9 +206,7 @@ export default function Login() {
 
             <button
               type="button"
-              onClick={() =>
-                signIn("google", { callbackUrl: "/dashboard/student/upload" })
-              }
+              onClick={handleGoogleLogin}
               className={`${dmSans_lightest.className} cursor-pointer bg-gradient-to-l text-3xl from-purple-400 to-purple-900
                           text-gray-300 w-full h-17 md:h-16 lg:h-20 p-3 sm:p-4 flex items-center justify-center
                           gap-2 sm:gap-3 transition-colors duration-300 hover:from-purple-700 hover:to-purple-900`}

@@ -4,7 +4,6 @@ import { LiaHomeSolid } from "react-icons/lia";
 import { CiLogin } from "react-icons/ci";
 import { FiMenu } from "react-icons/fi";
 import { RxCross1 } from "react-icons/rx";
-import { FaUser } from "react-icons/fa";
 import Link from "next/link";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -26,13 +25,49 @@ const ds = DM_Sans({
   weight: ["400"],
 });
 
-const menuItems = [
-  { href: "/dashboard/student/analytics", label: "Dashboard" },
-  { href: "/dashboard/student/upload", label: "Check Plagiarism" },
-  { href: "/dashboard/student/report", label: "Reports" },
-  { href: "/dashboard/student/settings", label: "Settings" },
-  { href: "/login", label: "Logout" },
-];
+// Function to generate menu items based on role and username
+const getMenuItems = (role, userName) => {
+  const nameSlug = userName
+    ? userName.toLowerCase().replace(/\s+/g, "-")
+    : "user";
+
+  if (role === "teacher") {
+    return [
+      { href: `/dashboard/teacher/${nameSlug}`, label: "Dashboard" },
+      {
+        href: `/dashboard/teacher/${nameSlug}/lexical-analysis`,
+        label: "Lexical Analysis",
+      },
+      {
+        href: `/dashboard/teacher/${nameSlug}/semantic-analysis`,
+        label: "Semantic Analysis",
+      },
+      {
+        href: `/dashboard/teacher/${nameSlug}/internal-analysis`,
+        label: "Internal Analysis",
+      },
+      { href: `/dashboard/teacher/${nameSlug}/reports`, label: "Reports" },
+      { href: `/dashboard/teacher/${nameSlug}/settings`, label: "Settings" },
+      { href: "/login", label: "Logout" },
+    ];
+  }
+
+  if (role === "student") {
+    return [
+      { href: `/dashboard/student/${nameSlug}`, label: "Dashboard" },
+      {
+        href: `/dashboard/student/${nameSlug}/upload`,
+        label: "Check Plagiarism",
+      },
+      { href: `/dashboard/student/${nameSlug}/report`, label: "Reports" },
+      { href: `/dashboard/student/${nameSlug}/settings`, label: "Settings" },
+      { href: "/login", label: "Logout" },
+    ];
+  }
+
+  // Default / not logged in
+  return [{ href: "/login", label: "Login" }];
+};
 
 export default function Navbar() {
   const router = useRouter();
@@ -40,25 +75,18 @@ export default function Navbar() {
   const [isMenu, setIsMenu] = useState(false);
 
   const handleLogout = () => {
-    signOut({
-      callbackUrl: "/login",
-    });
+    signOut({ callbackUrl: "/login" });
   };
 
   // Get user display name - prioritize name, then email username
   const getUserDisplayName = () => {
     if (!session?.user) return "User";
-
-    if (session.user.name) {
-      return session.user.name;
-    }
-
-    if (session.user.email) {
-      return session.user.email.split("@")[0];
-    }
-
+    if (session.user.name) return session.user.name;
     return "User";
   };
+
+  // Get dynamic menu items based on session role
+  const menuItems = getMenuItems(session?.user?.role, getUserDisplayName());
 
   return (
     <>
@@ -72,17 +100,14 @@ export default function Navbar() {
             {/* User Info Section */}
             {status === "authenticated" && session?.user && (
               <div className="flex items-center gap-4">
-                {/* User Avatar */}
-                <div className="flex items-center gap-4">
-                  {/* User Name */}
-                  <span
-                    className={`${rw.className} text-gray-200 text-sm px-7 underline md:text-base font-medium`}
-                  >
-                    {getUserDisplayName()}
-                  </span>
-                </div>
+                <span
+                  className={`${rw.className} text-gray-200 text-sm px-7 underline md:text-base font-medium`}
+                >
+                  {getUserDisplayName()}
+                </span>
               </div>
             )}
+
             {/* Menu Button */}
             {!isMenu ? (
               <motion.div
@@ -99,7 +124,7 @@ export default function Navbar() {
               >
                 <AnimatePresence>
                   {menuItems.map((item, index) => {
-                    // Handle "Logout" differently:
+                    // Handle "Logout" differently
                     if (item.label === "Logout") {
                       return (
                         <motion.div
@@ -108,7 +133,7 @@ export default function Navbar() {
                           animate={{ opacity: 1, x: 0 }}
                           exit={{ opacity: 0, x: 50 }}
                           transition={{
-                            duration: 0,
+                            duration: 0.3,
                             delay: index * 0.1,
                             ease: "easeOut",
                           }}
@@ -126,7 +151,6 @@ export default function Navbar() {
                       );
                     }
 
-                    // For all other items, render a normal Link
                     return (
                       <motion.div
                         key={item.href}

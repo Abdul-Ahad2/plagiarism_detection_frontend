@@ -101,9 +101,9 @@ export default function Home() {
 
             <Link
               href="/register"
-              className={`${rw_less_bold.className} px-12 py-10 text-center mt-4 text-purple-200 bg-gradient-to-r from-purple-700 to-purple-400 hover:to-purple-500 hover:from-purple-900 hover:text-gray-300 text-2xl inline-flex items-center transition-colors duration-700 ease-in-out justify-center`}
+              className={`${rw_less_bold.className} px-17 py-10 text-center mt-4 text-purple-200 bg-gradient-to-r from-purple-700 to-purple-400 hover:to-purple-500 hover:from-purple-900 hover:text-gray-300 text-2xl inline-flex items-center transition-colors duration-700 ease-in-out justify-center`}
             >
-              Try It Now →
+              Try It Now
             </Link>
           </div>
         </div>
@@ -129,11 +129,11 @@ export default function Home() {
             </div>
 
             <div
-              className="absolute top-16 right-16 w-3 h-3 bg-white rotate-45 animate-pulse"
+              className="absolute top-16 right-16 w-3 h-3 bg-purple-400 rotate-45 rounded-full animate-pulse"
               style={{ animationDelay: "0s" }}
             ></div>
             <div
-              className="absolute bottom-20 left-12 w-2 h-2 bg-gray-500 rounded-full animate-pulse"
+              className="absolute bottom-20 left-12 w-2 h-2 bg-purple-300 rounded-full animate-pulse"
               style={{ animationDelay: "1s" }}
             ></div>
 
@@ -247,7 +247,7 @@ export default function Home() {
                 <h1
                   className={`${rw_less_bold.className} text-2xl md:text-xl lg:text-6xl  m-2 md:m-3 text-gray-200`}
                 >
-                  BERT with Cosine Similarity
+                  Retrieval Augmented Generation
                 </h1>
                 <p
                   className={`${dmSans_lighter.className} text-xl md:text-lg lg:text-4xl  p-2 md:p-3 lg:p-4 text-gray-200`}

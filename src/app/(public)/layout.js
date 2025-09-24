@@ -1,11 +1,14 @@
 // app/(public)/layout.js
 import Navbar from "@/components/navbars/MainNavbar";
+import Footer from "@/components/Footer";
+
 import { Toaster } from "sonner";
 
 export default function PublicLayout({ children }) {
   return (
     <>
       <Navbar />
+
       {children}
       <Toaster
         position="bottom-right"
@@ -20,6 +23,7 @@ export default function PublicLayout({ children }) {
           },
         }}
       />
+      <Footer />
     </>
   );
 }

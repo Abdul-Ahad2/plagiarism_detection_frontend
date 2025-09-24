@@ -8,6 +8,7 @@ import "@/lib/mongodb";
 
 export const authOptions = {
   session: { strategy: "jwt" },
+  debug: true,
 
   providers: [
     CredentialsProvider({
@@ -66,7 +67,8 @@ export const authOptions = {
   ],
 
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger, session }) {
+      // Handle initial sign-in
       if (account) {
         if (account.provider === "credentials") {
           token.sub = user.id;
@@ -74,13 +76,13 @@ export const authOptions = {
           token.email = user.email;
           token.name = user.name;
           token.picture = user.image ?? null;
+          console.log("- Credentials login, role set to:", token.role);
         } else if (account.provider === "google") {
           const dbUser = await User.findOneAndUpdate(
             { email: user.email },
             {
               $set: { name: user.name, image: user.image },
-
-              $setOnInsert: { role: "student", password: null },
+              $setOnInsert: { role: null, password: null },
             },
             { upsert: true, new: true }
           );
@@ -92,6 +94,23 @@ export const authOptions = {
           token.picture = dbUser.image;
         }
       }
+
+      // Handle session updates (when update() is called)
+      if (trigger === "update") {
+        try {
+          const dbUser = await User.findOne({ email: token.email });
+          if (dbUser) {
+            const oldRole = token.role;
+            token.role = dbUser.role;
+          } else {
+            console.log("JWT: No user found in DB for email:", token.email);
+          }
+        } catch (error) {
+          console.error("JWT: Error fetching updated user data:", error);
+        }
+      }
+
+      console.log("- Final token role:", token.role);
       return token;
     },
 
