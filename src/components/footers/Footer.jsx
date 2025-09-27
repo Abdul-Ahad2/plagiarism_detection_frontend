@@ -8,11 +8,6 @@ const bs = Berkshire_Swash({
   weight: ["400"],
 });
 
-const dmSans_light = DM_Sans({
-  subsets: ["latin"],
-  weight: ["500"],
-});
-
 const dmSans_lighter = DM_Sans({
   subsets: ["latin"],
   weight: ["300"],
@@ -120,17 +115,7 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      <div className="bg-[#E4E4E4] pt-0 ">
-        <div
-          className={`${dmSans_lighter.className} w-full bg-gray-950 text-white py-4 text-center md:text-left `}
-        >
-          <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-center text-base">
-            <div className="mb-2 md:mb-0">
-              © {new Date().getFullYear()} SleuthInk. All Rights Reserved.
-            </div>
-          </div>
-        </div>
-      </div>
+      <div className="bg-[#E4E4E4] pt-0 "></div>
     </>
   );
 }

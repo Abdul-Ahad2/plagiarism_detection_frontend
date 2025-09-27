@@ -1,270 +1,297 @@
 "use client";
-
-
-import React, { useMemo, useState, useEffect } from "react";
+import { useState } from "react";
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  BarChart,
-  Bar,
-} from "recharts";
+  Upload,
+  FileText,
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  Search,
+  Filter,
+  Eye,
+  Download,
+  Trash2,
+  BarChart3,
+  Database,
+  RefreshCw,
+} from "lucide-react";
+import Grid from "@/components/Grid";
+// Mock Grid component
 
-// Teacher Dashboard with only mock data (no API required)
+export default function TeacherDashboard() {
+  const [activeTab, setActiveTab] = useState("overview");
+  const [searchQuery, setSearchQuery] = useState("");
 
-export default function TeacherDashboardFull() {
-  // Mock states
-  const [reports, setReports] = useState([]);
-  const [events, setEvents] = useState([]);
-  const [stats, setStats] = useState(null);
-
-  useEffect(() => {
-    // Fake reports
-    const fakeReports = [
-      {
-        id: 1,
-        studentName: "Ali Raza",
-        fileName: "Research Paper",
-        similarity: 82,
-        date: "2025-09-01",
-      },
-      {
-        id: 2,
-        studentName: "Sara Khan",
-        fileName: "Essay on AI",
-        similarity: 45,
-        date: "2025-09-02",
-      },
-      {
-        id: 3,
-        studentName: "Usman Ahmed",
-        fileName: "Case Study",
-        similarity: 91,
-        date: "2025-09-03",
-      },
-    ];
-    setReports(fakeReports);
-
-    // Fake events
-    setEvents([
-      { id: "e1", text: "Ali uploaded Research Paper", time: "2025-09-01" },
-      { id: "e2", text: "Sara uploaded Essay on AI", time: "2025-09-02" },
-    ]);
-
-    // Fake stats
-    setStats({
-      totalStudents: 120,
-      totalReports: 340,
-      avgSimilarity: 42,
-      flaggedCount: 18,
-    });
-  }, []);
-
-  // Derived metrics
-  const metrics = useMemo(() => {
-    const totalReports = reports.length;
-    const flaggedCount = reports.filter((r) => r.similarity >= 70).length;
-    const avgSimilarity =
-      totalReports === 0
-        ? 0
-        : Math.round(
-            reports.reduce((s, r) => s + r.similarity, 0) / totalReports
-          );
-
-    return {
-      totalReports,
-      flaggedCount,
-      avgSimilarity,
-      studentsCount: 10,
-      reportsToday: 2,
-    };
-  }, [reports]);
-
-  // Chart data (fake)
-  const trendData = [
-    { day: "Mon", avg: 45, count: 12 },
-    { day: "Tue", avg: 60, count: 15 },
-    { day: "Wed", avg: 50, count: 18 },
-    { day: "Thu", avg: 55, count: 14 },
-    { day: "Fri", avg: 70, count: 20 },
+  // Mock data
+  const recentReports = [
+    {
+      id: 1,
+      fileName: "Essay_Analysis_Smith.pdf",
+      submittedBy: "John Smith",
+      uploadDate: "2024-01-15",
+      plagiarismScore: 23,
+      status: "completed",
+      flagged: true,
+    },
+    {
+      id: 2,
+      fileName: "Research_Paper_Johnson.docx",
+      submittedBy: "Emma Johnson",
+      uploadDate: "2024-01-14",
+      plagiarismScore: 8,
+      status: "completed",
+      flagged: false,
+    },
+    {
+      id: 3,
+      fileName: "Literature_Review_Wilson.pdf",
+      submittedBy: "Michael Wilson",
+      uploadDate: "2024-01-14",
+      plagiarismScore: 45,
+      status: "processing",
+      flagged: true,
+    },
+    {
+      id: 4,
+      fileName: "Case_Study_Brown.docx",
+      submittedBy: "Sarah Brown",
+      uploadDate: "2024-01-13",
+      plagiarismScore: 12,
+      status: "completed",
+      flagged: false,
+    },
   ];
 
-  const similarityDistribution = [
-    { name: "0-30", value: 5 },
-    { name: "31-70", value: 10 },
-    { name: "71-100", value: 3 },
-  ];
+  const stats = {
+    totalDocuments: 156,
+    flaggedDocuments: 23,
+    avgPlagiarismScore: 18.5,
+    documentsToday: 7,
+  };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-r from-black to-gray-900 text-gray-200 py-12">
- 
-      <div className="max-w-7xl mx-auto px-6 space-y-8">
-        {/* Header */}
-        <div className="flex items-center justify-between">
+  const StatCard = ({ title, value, subtitle, icon: Icon, trend }) => (
+    <div className="bg-gray-800/50 backdrop-blur-sm rounded-md p-6 border border-gray-700/50 hover:border-purple-500/50 transition-all duration-300">
+      <div className="flex items-center justify-between mb-4">
+        <div className="p-3 rounded-md bg-purple-600/20">
+          <Icon className="w-6 h-6 text-purple-400" />
+        </div>
+        {trend && (
+          <span className="text-green-400 text-sm font-medium">+{trend}%</span>
+        )}
+      </div>
+      <h3 className="text-2xl font-bold text-white mb-1">{value}</h3>
+      <p className="text-gray-400 text-sm">{title}</p>
+      {subtitle && <p className="text-gray-500 text-xs mt-1">{subtitle}</p>}
+    </div>
+  );
+
+  const DocumentRow = ({ doc }) => (
+    <div className="bg-gray-800/30 backdrop-blur-sm rounded-md p-4 border border-gray-700/30 hover:border-purple-500/50 transition-all duration-300">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <div className="p-2 rounded-md bg-gray-700/50">
+            <FileText className="w-5 h-5 text-gray-400" />
+          </div>
           <div>
-            <h1 className="text-4xl font-extrabold">Teacher Dashboard</h1>
-            <p className="text-gray-400 mt-1">
-              Overview of submissions, flagged cases and system health
+            <h4 className="text-white font-medium">{doc.fileName}</h4>
+            <p className="text-gray-400 text-sm">
+              by {doc.submittedBy} • {doc.uploadDate}
             </p>
           </div>
-          <div className="text-right">
-            <div className="text-sm text-gray-400">Reports today</div>
-            <div className="text-xl font-bold">{metrics.reportsToday}</div>
-          </div>
         </div>
 
-        {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <KpiCard title="Total Reports" value={metrics.totalReports} />
-          <KpiCard title="Flagged Reports" value={metrics.flaggedCount} />
-          <KpiCard title="Avg Similarity" value={`${metrics.avgSimilarity}%`} />
-          <KpiCard title="Students" value={metrics.studentsCount} />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left side */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Line chart */}
-            <div className="p-6 rounded-2xl bg-gray-800/50 shadow">
-              <h3 className="text-lg font-semibold mb-4">Similarity Trend</h3>
-              <div style={{ height: 220 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={trendData}>
-                    <XAxis dataKey="day" stroke="#9ca3af" />
-                    <YAxis stroke="#9ca3af" />
-                    <Tooltip />
-                    <Line
-                      type="monotone"
-                      dataKey="avg"
-                      stroke="#a855f7"
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
+        <div className="flex items-center space-x-4">
+          <div className="text-center">
+            <div
+              className={`text-lg font-bold ${
+                doc.plagiarismScore > 30
+                  ? "text-red-400"
+                  : doc.plagiarismScore > 15
+                  ? "text-yellow-400"
+                  : "text-green-400"
+              }`}
+            >
+              {doc.status === "processing" ? "-" : `${doc.plagiarismScore}%`}
             </div>
-
-            {/* Distribution */}
-            <div className="p-6 rounded-2xl bg-gray-800/50 shadow flex flex-col md:flex-row gap-6">
-              <div className="flex-1">
-                <h4 className="font-semibold mb-3">Similarity Distribution</h4>
-                <div style={{ height: 180 }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={similarityDistribution}>
-                      <XAxis dataKey="name" stroke="#9ca3af" />
-                      <YAxis stroke="#9ca3af" />
-                      <Tooltip />
-                      <Bar dataKey="value" fill="#a855f7" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-              <div className="w-44">
-                <h4 className="font-semibold mb-3">Flagged vs Clean</h4>
-                <div style={{ height: 140 }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={similarityDistribution}
-                        dataKey="value"
-                        outerRadius={60}
-                        label
-                      >
-                        <Cell fill="#10b981" />
-                        <Cell fill="#f97316" />
-                        <Cell fill="#ef4444" />
-                      </Pie>
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </div>
-
-            {/* Recent flagged reports */}
-            <div className="p-6 rounded-2xl bg-gray-800/50 shadow">
-              <h3 className="text-lg font-semibold mb-3">
-                Recent Flagged Reports
-              </h3>
-              <div className="space-y-3">
-                {reports
-                  .filter((r) => r.similarity >= 70)
-                  .map((r) => (
-                    <div
-                      key={r.id}
-                      className="flex items-center justify-between p-3 rounded-md bg-gray-900/40"
-                    >
-                      <div>
-                        <div className="font-medium">{r.studentName}</div>
-                        <div className="text-sm text-gray-400">
-                          {r.fileName} • {r.similarity}%
-                        </div>
-                      </div>
-                      <button className="px-3 py-1 rounded bg-gray-800">
-                        View
-                      </button>
-                    </div>
-                  ))}
-              </div>
-            </div>
+            <p className="text-gray-500 text-xs">Similarity</p>
           </div>
 
-          {/* Right side */}
-          <div className="space-y-6">
-            {/* Activity */}
-            <div className="p-4 rounded-2xl bg-gray-800/50 shadow">
-              <h3 className="font-semibold mb-3">Activity Feed</h3>
-              <div className="space-y-3 text-sm text-gray-300">
-                {events.map((e) => (
-                  <div key={e.id} className="p-3 rounded-md bg-gray-900/20">
-                    <div className="flex items-center justify-between">
-                      <div>{e.text}</div>
-                      <div className="text-xs text-gray-400">{e.time}</div>
-                    </div>
-                  </div>
-                ))}
+          <div className="flex items-center space-x-1">
+            {doc.status === "processing" ? (
+              <div className="flex items-center text-yellow-400">
+                <Clock className="w-4 h-4 mr-1" />
+                <span className="text-sm">Processing</span>
               </div>
-            </div>
+            ) : doc.flagged ? (
+              <div className="flex items-center text-red-400">
+                <AlertTriangle className="w-4 h-4 mr-1" />
+                <span className="text-sm">Flagged</span>
+              </div>
+            ) : (
+              <div className="flex items-center text-green-400">
+                <CheckCircle className="w-4 h-4 mr-1" />
+                <span className="text-sm">Clear</span>
+              </div>
+            )}
+          </div>
 
-            {/* System health */}
-            <div className="p-4 rounded-2xl bg-gray-800/50 shadow">
-              <h3 className="font-semibold mb-3">System Health</h3>
-              <div className="text-sm text-gray-300 space-y-2">
-                <div className="flex justify-between">
-                  <span>Queue length</span>
-                  <span>5</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>FastAPI status</span>
-                  <span className="text-green-400">Online</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Avg processing</span>
-                  <span>120ms</span>
-                </div>
-              </div>
-            </div>
+          <div className="flex items-center space-x-2">
+            <button className="p-2 rounded-md bg-purple-600/20 hover:bg-purple-600/40 text-purple-400 transition-colors">
+              <Eye className="w-4 h-4" />
+            </button>
+            <button className="p-2 rounded-md bg-gray-600/20 hover:bg-gray-600/40 text-gray-400 transition-colors">
+              <Download className="w-4 h-4" />
+            </button>
+            <button className="p-2 rounded-md bg-red-600/20 hover:bg-red-600/40 text-red-400 transition-colors">
+              <Trash2 className="w-4 h-4" />
+            </button>
           </div>
         </div>
-
-        <div className="pb-20" />
       </div>
     </div>
   );
-}
 
-// Small reusable KPI card
-function KpiCard({ title, value }) {
+  const QuickAction = ({
+    icon: Icon,
+    title,
+    description,
+    action,
+    variant = "default",
+  }) => (
+    <div
+      onClick={action}
+      className={`cursor-pointer p-6 rounded-md border transition-all duration-300 hover:scale-105 ${
+        variant === "primary"
+          ? "bg-gradient-to-r from-purple-600/20 to-purple-700/20 border-purple-500/50 hover:border-purple-400"
+          : "bg-gray-800/50 border-gray-700/50 hover:border-purple-500/50"
+      } backdrop-blur-sm`}
+    >
+      <div className="flex items-center mb-4">
+        <div
+          className={`p-3 rounded-md ${
+            variant === "primary" ? "bg-purple-600/30" : "bg-gray-700/50"
+          }`}
+        >
+          <Icon
+            className={`w-6 h-6 ${
+              variant === "primary" ? "text-purple-300" : "text-gray-400"
+            }`}
+          />
+        </div>
+      </div>
+      <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
+      <p className="text-gray-400 text-sm">{description}</p>
+    </div>
+  );
+
   return (
-    <div className="p-6 rounded-2xl bg-gray-800/50 shadow text-center">
-      <h4 className="text-gray-400">{title}</h4>
-      <p className="text-2xl font-bold">{value}</p>
+    <div className="min-h-screen bg-gradient-to-r from-black to-gray-900 text-gray-300">
+      <Grid height={170} />
+
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-12">
+        {/* Header */}
+        <div className="mb-12 mt-24">
+          <h1 className="text-6xl md:text-7xl font-bold mb-4">
+            <span className="bg-gradient-to-r from-purple-200 to-purple-700 bg-clip-text text-transparent">
+              Dashboard
+            </span>
+          </h1>
+          <p className="text-xl text-gray-400">
+            Monitor document submissions and plagiarism detection results
+          </p>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-2 mb-12">
+          <StatCard
+            title="Total Documents"
+            value={stats.totalDocuments}
+            subtitle="All time submissions"
+            icon={FileText}
+            trend={12}
+          />
+          <StatCard
+            title="Flagged Documents"
+            value={stats.flaggedDocuments}
+            subtitle="Requiring attention"
+            icon={AlertTriangle}
+          />
+          <StatCard
+            title="Avg. Similarity Score"
+            value={`${stats.avgPlagiarismScore}%`}
+            subtitle="Across all documents"
+            icon={BarChart3}
+          />
+          <StatCard
+            title="Documents Today"
+            value={stats.documentsToday}
+            subtitle="Processed today"
+            icon={Clock}
+            trend={5}
+          />
+        </div>
+
+        {/* Quick Actions */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-white mb-6">Quick Actions</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-2">
+            <QuickAction
+              icon={Upload}
+              title="Upload Document"
+              description="Check a new document for plagiarism"
+              variant="primary"
+              action={() => console.log("Upload document")}
+            />
+            <QuickAction
+              icon={Database}
+              title="Batch Analysis"
+              description="Compare multiple documents against each other"
+              action={() => console.log("Batch analysis")}
+            />
+            <QuickAction
+              icon={BarChart3}
+              title="View Analytics"
+              description="See detailed plagiarism statistics and trends"
+              action={() => console.log("View analytics")}
+            />
+            <QuickAction
+              icon={RefreshCw}
+              title="Recheck Documents"
+              description="Run plagiarism check again on selected files"
+              action={() => console.log("Recheck documents")}
+            />
+          </div>
+        </div>
+
+        {/* Recent Documents */}
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-white">Recent Documents</h2>
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search documents..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 pr-4 py-2 bg-gray-700/50 border border-gray-600 rounded-md text-white focus:border-purple-500 focus:outline-none placeholder-gray-400"
+                />
+              </div>
+              <button className="flex items-center px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-md text-white hover:border-purple-500 transition-colors">
+                <Filter className="w-4 h-4 mr-2" />
+                Filter
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {recentReports.map((doc) => (
+              <DocumentRow key={doc.id} doc={doc} />
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

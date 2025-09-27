@@ -1,8 +1,9 @@
 // app/(public)/layout.js
 import Navbar from "@/components/navbars/MainNavbar";
-import Footer from "@/components/Footer";
+import Footer from "@/components/footers/Footer";
 
 import { Toaster } from "sonner";
+import CopywriteFooter from "@/components/footers/CopywriteFooter";
 
 export default function PublicLayout({ children }) {
   return (
@@ -24,6 +25,7 @@ export default function PublicLayout({ children }) {
         }}
       />
       <Footer />
+      <CopywriteFooter />
     </>
   );
 }

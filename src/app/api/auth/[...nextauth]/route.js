@@ -5,6 +5,7 @@ import User from "@/models/user.model";
 import bcrypt from "bcrypt";
 import { z } from "zod";
 import "@/lib/mongodb";
+import jwt from "jsonwebtoken";
 
 export const authOptions = {
   session: { strategy: "jwt" },
@@ -111,6 +112,14 @@ export const authOptions = {
       }
 
       console.log("- Final token role:", token.role);
+      try {
+        const signed = jwt.sign(token, process.env.NEXTAUTH_SECRET, {
+          algorithm: "HS256",
+        });
+        console.log("🔐 Signed JWT:", signed);
+      } catch (err) {
+        console.error("Error signing token:", err);
+      }
       return token;
     },
 

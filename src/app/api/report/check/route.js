@@ -31,7 +31,7 @@ export async function POST(req) {
 
   const upstreamUrl = `${
     process.env.FASTAPI_URL || "http://localhost:8000"
-  }/plagiarism/check`;
+  }/student/lexical-analysis`;
 
   let upstream;
   try {

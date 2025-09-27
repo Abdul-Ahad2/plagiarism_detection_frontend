@@ -121,7 +121,7 @@ export default function RoleModal() {
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-black/80 to-gray-900/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-md text-white rounded-2xl border border-gray-700/50 max-w-4xl w-full">
+      <div className="bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-md text-white rounded-md border border-gray-700/50 max-w-4xl w-full">
         {/* Header */}
         <div className="text-center p-8 pb-6">
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
@@ -143,7 +143,7 @@ export default function RoleModal() {
               <div
                 key={role.id}
                 className={`
-                  relative bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 
+                  relative bg-gray-800/50 backdrop-blur-sm rounded-md p-6 
                   border transition-all duration-300 cursor-pointer group
                   ${
                     selectedRole === role.id
@@ -212,11 +212,11 @@ export default function RoleModal() {
               onClick={handleSelectRole}
               disabled={!selectedRole || isLoading}
               className={`
-                px-12 py-4 rounded-xl text-lg font-semibold transition-all duration-300
+                px-12 py-4 rounded-md text-lg font-semibold transition-all duration-300
                 flex items-center justify-center min-w-[200px]
                 ${
                   selectedRole && !isLoading
-                    ? "bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white transform hover:scale-105"
+                    ? "bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white transform hover:scale-95"
                     : "bg-gray-700 text-gray-400 cursor-not-allowed"
                 }
               `}
