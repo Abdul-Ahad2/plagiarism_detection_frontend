@@ -27,18 +27,21 @@ export default function UploadPage() {
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   ];
 
-  const handleDrop = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const dropped = Array.from(e.dataTransfer.files);
-    const valid = dropped.filter((f) => validTypes.includes(f.type));
-    if (valid.length) {
-      setFiles((prev) => [...prev, ...valid]);
-      setError(null);
-    } else {
-      setError("Please upload PDF, DOC, or DOCX files only");
-    }
-  }, []);
+  const handleDrop = useCallback(
+    (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const dropped = Array.from(e.dataTransfer.files);
+      const valid = dropped.filter((f) => validTypes.includes(f.type));
+      if (valid.length) {
+        setFiles((prev) => [...prev, ...valid]);
+        setError(null);
+      } else {
+        setError("Please upload PDF, DOC, or DOCX files only");
+      }
+    },
+    [validTypes]
+  );
 
   const handleChange = (e) => {
     const picked = Array.from(e.target.files || []);

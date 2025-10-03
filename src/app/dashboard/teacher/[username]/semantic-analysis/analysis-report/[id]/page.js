@@ -189,7 +189,7 @@ export default function SemanticAnalysisReport() {
           <p
             className={`${dmSans_light.className} text-white font-medium mb-2`}
           >
-            "{match.text}"
+            &quot;{match.text}&quot;
           </p>
           <div className="space-y-1">
             <p className="text-blue-400 text-sm font-medium">{match.source}</p>

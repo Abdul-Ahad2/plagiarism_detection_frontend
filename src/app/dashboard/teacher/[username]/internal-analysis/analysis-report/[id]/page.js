@@ -75,7 +75,7 @@ export default function InternalAnalysisReport() {
   const OverlapCard = ({ overlap }) => (
     <div className="p-4 rounded-md bg-gray-800/40 border-l-4 border-red-500">
       <p className={`${dmSans_light.className} text-white font-medium mb-2`}>
-        "{overlap.text}"
+        &quot;{overlap.text}&quot;
       </p>
       <div className="text-sm text-gray-300 space-y-1">
         <p>

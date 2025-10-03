@@ -200,7 +200,7 @@ export default function TeacherAnalysisPage() {
     >
       <div className="flex justify-between items-start mb-2">
         <p className="text-white font-medium text-sm line-clamp-2">
-          "{match.text}"
+          &quot;{match.text}&quot;
         </p>
         <span
           className={`text-sm font-bold ml-2 ${
@@ -481,7 +481,7 @@ export default function TeacherAnalysisPage() {
                           >
                             <div className="flex justify-between items-start mb-2">
                               <p className="text-white font-medium">
-                                "{match.text}"
+                                &quot;{match.text}&quot;
                               </p>
                               <span className="text-purple-400 font-bold">
                                 {match.similarity}%

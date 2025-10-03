@@ -61,7 +61,7 @@ export default function Login() {
         );
       }
     }
-  }, [status, session]);
+  }, [status, session, router]);
 
   useEffect(() => {
     // Check if touch device

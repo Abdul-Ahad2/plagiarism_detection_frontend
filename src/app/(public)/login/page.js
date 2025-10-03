@@ -55,7 +55,7 @@ export default function Login() {
         );
       }
     }
-  }, [status, session]);
+  }, [status, session, router]);
 
   useEffect(() => {
     setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
