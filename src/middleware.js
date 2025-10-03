@@ -36,7 +36,6 @@ export async function middleware(req) {
     // Role-based dashboard access for users WITH roles
     if (pathname.startsWith("/dashboard/")) {
       const pathRole = pathname.split("/")[2]; // Extract role from /dashboard/[role]/...
-
       console.log("Path role:", pathRole, "User role:", token.role);
 
       // If trying to access wrong role dashboard, redirect to correct one
