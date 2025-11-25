@@ -42,7 +42,7 @@ export async function middleware(req) {
       if (
         pathRole &&
         pathRole !== token.role &&
-        ["student", "teacher", "researcher"].includes(pathRole)
+        ["student", "teacher", "developer"].includes(pathRole)
       ) {
         console.log(
           `User with role ${token.role} trying to access ${pathRole} dashboard, redirecting`

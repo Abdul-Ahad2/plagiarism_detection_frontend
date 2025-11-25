@@ -53,6 +53,13 @@ export default function Login() {
             .split(" ")
             .join("-")}`
         );
+      } else if (session.user.role === "developer") {
+        router.push(
+          `/dashboard/developer/${session.user.name
+            .toLowerCase()
+            .split(" ")
+            .join("-")}`
+        );
       }
     }
   }, [status, session, router]);
@@ -113,9 +120,16 @@ export default function Login() {
             .split(" ")
             .join("-")}`
         );
-      } else {
+      } else if (role === "student") {
         router.push(
           `/dashboard/student/${session.user.name
+            .toLowerCase()
+            .split(" ")
+            .join("-")}`
+        );
+      } else if (role === "developer") {
+        router.push(
+          `/dashboard/developer/${session.user.name
             .toLowerCase()
             .split(" ")
             .join("-")}`

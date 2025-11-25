@@ -24,6 +24,7 @@ export async function POST(req) {
 
   // forward the request body (files) to FastAPI
   const formData = await req.formData();
+  console.log("ye hai", signedToken);
 
   const upstream = await fetch(
     `${process.env.FASTAPI_URL}/teacher/internal-analysis`,

@@ -44,7 +44,7 @@ const getMenuItems = (role, userName) => {
       },
       {
         href: `/dashboard/teacher/${nameSlug}/internal-analysis`,
-        label: "Internal Analysis",
+        label: "Batch Comparison",
       },
       { href: `/dashboard/teacher/${nameSlug}/reports`, label: "Reports" },
       { href: `/dashboard/teacher/${nameSlug}/settings`, label: "Settings" },
@@ -61,6 +61,14 @@ const getMenuItems = (role, userName) => {
       },
       { href: `/dashboard/student/${nameSlug}/report`, label: "Reports" },
       { href: `/dashboard/student/${nameSlug}/settings`, label: "Settings" },
+      { href: "/login", label: "Logout" },
+    ];
+  }
+
+  if (role === "developer") {
+    return [
+      { href: `/dashboard/developer/${nameSlug}`, label: "Console" },
+      { href: `/dashboard/developer/${nameSlug}/settings`, label: "Settings" },
       { href: "/login", label: "Logout" },
     ];
   }
@@ -120,7 +128,7 @@ export default function Navbar() {
               </motion.div>
             ) : (
               <div
-                className={`${rw.className} flex items-center justify-center gap-12`}
+                className={`${rw.className} flex items-center justify-center gap-10`}
               >
                 <AnimatePresence>
                   {menuItems.map((item, index) => {

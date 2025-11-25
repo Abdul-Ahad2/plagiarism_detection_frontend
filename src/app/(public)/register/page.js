@@ -188,8 +188,8 @@ export default function Login() {
               <option value="teacher" className="text-black">
                 Teacher
               </option>
-              <option value="researcher" className="text-black">
-                Researcher
+              <option value="developer" className="text-black">
+                Developer
               </option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-6 pointer-events-none">

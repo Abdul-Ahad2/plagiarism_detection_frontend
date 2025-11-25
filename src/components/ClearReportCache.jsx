@@ -1,23 +1,33 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 
 export default function ClearReportCache() {
   const { data: session } = useSession();
   const pathname = usePathname();
+  const previousPathRef = useRef(pathname);
 
   useEffect(() => {
-    if (!session?.user?.name) return; // <-- guard
+    if (!session?.user?.name) return;
 
-    const currentPath = `/dashboard/student/${session.user.name
+    const reportPathPattern = `/dashboard/student/${session.user.name
       .toLowerCase()
-      .replace(" ", "-")}/report/`;
+      .replace(/\s+/g, "-")}/report/`;
 
-    if (!pathname.startsWith(currentPath) && localStorage.getItem("report")) {
+    // Only clear when leaving a report page, not when entering one
+    const wasOnReportPage =
+      previousPathRef.current?.startsWith(reportPathPattern);
+    const isOnReportPage = pathname.startsWith(reportPathPattern);
+
+    if (wasOnReportPage && !isOnReportPage) {
+      console.log("Left report page, clearing cache");
       localStorage.removeItem("report");
+      sessionStorage.removeItem("report");
     }
+
+    previousPathRef.current = pathname;
   }, [pathname, session]);
 
   return null;

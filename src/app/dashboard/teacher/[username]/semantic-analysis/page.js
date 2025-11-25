@@ -82,7 +82,7 @@ export default function UploadPage() {
 
       // POST to Next API which forwards with HS256 token to FastAPI
       const res = await axios.post(
-        "/api/report/teacher/semantic-analysis",
+        "/api/v1/teacher/semantic-analysis",
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
@@ -112,7 +112,7 @@ export default function UploadPage() {
       <div className="h-auto bg-gradient-to-r from-black to-gray-900 text-gray-300 py-44">
         <Grid height={135} />
         <div className="max-w-4xl mx-auto">
-          <h1 className={`${rw_bold.className} text-8xl mb-6 text-center`}>
+          <h1 className="text-6xl md:text-8xl font-bold mb-6 text-center">
             Semantic{" "}
             <span className="bg-gradient-to-r from-purple-300 to-purple-700 bg-clip-text text-transparent">
               Analysis
@@ -131,7 +131,7 @@ export default function UploadPage() {
             <div
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleDrop}
-              className={`border-[1px] border-dashed p-20 text-center rounded-2xl transition-all 
+              className={`border-[1px] border-dashed p-20 text-center rounded-md transition-all 
               ${files.length ? "border-purple-500" : "border-gray-600 "} 
               ${error ? "border-red-500" : ""}`}
             >
@@ -146,7 +146,7 @@ export default function UploadPage() {
                   <p className={`${dmSans.className} text-gray-400`}>or</p>
                   <label className="cursor-pointer inline-block">
                     <span
-                      className={`${rw.className} bg-gradient-to-r from-purple-400 to-purple-700 text-white px-6 py-3 rounded-lg`}
+                      className={`${rw.className} bg-gradient-to-r from-purple-400 to-purple-700 text-white px-6 py-3 rounded-md`}
                     >
                       Browse Files
                     </span>

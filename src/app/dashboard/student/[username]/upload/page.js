@@ -28,9 +28,15 @@ const rw_bold = Raleway({
 
 async function postPlagiarismCheck(formData) {
   // no need to grab token—cookie is sent automatically
-  const response = await axios.post("/api/report/check", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
+  const response = await axios.post(
+    "/api/v1/student/lexical-analysis",
+    formData,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+    }
+  );
+  console.log(response.data);
+
   return response.data;
 }
 
@@ -86,6 +92,12 @@ export default function UploadPage() {
       return;
     }
 
+    // Check if session exists
+    if (!session || !session.user) {
+      setError("Please log in to upload files");
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
@@ -93,20 +105,31 @@ export default function UploadPage() {
       const formData = new FormData();
       formData.append("file", file);
 
-      // 1) Upload the file to /check-plagiarism (with token in headers)
+      // Upload the file
       const res = await postPlagiarismCheck(formData);
 
-      localStorage.setItem("report", JSON.stringify(res));
-      console.log("saves");
-      setTimeout(() => {
-        router.push(
-          `/dashboard/student/${session.user.name
-            .toLowerCase()
-            .replace(" ", "-")}/report/${res.id}`
-        );
-      }, 10000);
+      console.log("Response from API:", res);
+
+      // IMPORTANT: Save to localStorage immediately and synchronously
+      try {
+        localStorage.setItem("report", JSON.stringify(res));
+        console.log("Saved to localStorage:", localStorage.getItem("report"));
+      } catch (storageError) {
+        console.error("Failed to save to localStorage:", storageError);
+      }
+
+      // Add a small delay to ensure localStorage is written
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Then navigate
+      const username = session.user.name
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "");
+
+      router.push(`/dashboard/student/${username}/report/${res.id}`);
     } catch (err) {
-      console.error(err);
+      console.error("Error:", err);
       setError("An error occurred during upload. Try again later.");
     } finally {
       setIsLoading(false);

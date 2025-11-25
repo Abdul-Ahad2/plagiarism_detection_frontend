@@ -6,6 +6,7 @@ import bcrypt from "bcrypt";
 import { z } from "zod";
 import "@/lib/mongodb";
 import jwt from "jsonwebtoken";
+import settingsModel from "@/models/settings.model";
 
 export const authOptions = {
   session: { strategy: "jwt" },
@@ -88,11 +89,46 @@ export const authOptions = {
             { upsert: true, new: true }
           );
 
+          const existingSettings = await settingsModel.findOne({
+            userId: dbUser._id,
+          });
+          if (!existingSettings) {
+            await settingsModel.create({
+              userId: dbUser._id,
+              name: dbUser.name,
+              email: dbUser.email,
+            });
+          }
+
           token.sub = dbUser._id.toString();
           token.role = dbUser.role;
           token.email = dbUser.email;
           token.name = dbUser.name;
           token.picture = dbUser.image;
+        }
+        try {
+          const settings = await settingsModel.findOne({ userId: token.sub });
+          if (settings) {
+            // If settings exist and have name/email, use those instead
+            if (settings.name) token.name = settings.name;
+            if (settings.email) token.email = settings.email;
+
+            // Also update the User model to keep it in sync
+            await User.findByIdAndUpdate(token.sub, {
+              name: settings.name,
+              email: settings.email,
+            });
+
+            console.log(
+              "✅ Synced token and User model with settings on login:",
+              {
+                name: token.name,
+                email: token.email,
+              }
+            );
+          }
+        } catch (error) {
+          console.error("Error syncing settings on login:", error);
         }
       }
 
@@ -103,6 +139,8 @@ export const authOptions = {
           if (dbUser) {
             const oldRole = token.role;
             token.role = dbUser.role;
+            token.name = dbUser.name;
+            token.email = dbUser.email;
           } else {
             console.log("JWT: No user found in DB for email:", token.email);
           }

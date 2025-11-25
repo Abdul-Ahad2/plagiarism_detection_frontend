@@ -2,8 +2,8 @@ export default function Grid({ height }) {
   return (
     <>
       <div
-        className="absolute inset-0 pointer-events-none"
-        style={{ height: `${height}vh` }}
+        className="fixed inset-0 pointer-events-none z-0"
+        // style={{ height: `${height}vh` }}
       >
         {/* Dense grid pattern */}
         <div

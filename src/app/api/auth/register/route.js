@@ -4,11 +4,12 @@ import bcrypt from "bcrypt";
 import { z } from "zod";
 import "@/lib/mongodb";
 import User from "@/models/user.model";
+import settingsModel from "@/models/settings.model";
 
 const signupSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters long."),
   email: z.string().email("Please enter a valid email address."),
-  role: z.enum(["student", "teacher", "researcher"]),
+  role: z.enum(["student", "teacher", "developer"]),
   password: z
     .string()
     .min(8, "Password must be at least 8 characters long.")
@@ -45,6 +46,12 @@ export async function POST(req) {
       email,
       role,
       password: hash,
+    });
+
+    await settingsModel.create({
+      userId: user._id,
+      name: user.name,
+      email: user.email,
     });
 
     return NextResponse.json(

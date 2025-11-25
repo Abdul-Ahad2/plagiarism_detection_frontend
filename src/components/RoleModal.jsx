@@ -1,8 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Roboto, DM_Sans } from "next/font/google";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+
+const roboto = Roboto({
+  subsets: ["latin"],
+  weight: ["400", "500", "700", "900"],
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+});
 
 export default function RoleModal() {
   const { data: session, status, update } = useSession();
@@ -16,8 +27,7 @@ export default function RoleModal() {
       id: "student",
       title: "Student",
       description:
-        "Access learning materials, submit assignments, and track your academic progress",
-      icon: "🎓",
+        "Access learning materials, submit assignments, and track your academic progress with real-time feedback",
       features: [
         "Submit Documents",
         "View Reports",
@@ -29,8 +39,7 @@ export default function RoleModal() {
       id: "teacher",
       title: "Teacher",
       description:
-        "Create courses, manage students, and evaluate academic integrity",
-      icon: "👩‍🏫",
+        "Create courses, manage students, and evaluate academic integrity with comprehensive analytics",
       features: [
         "Manage Classes",
         "Review Submissions",
@@ -39,11 +48,10 @@ export default function RoleModal() {
       ],
     },
     {
-      id: "researcher",
-      title: "Researcher",
+      id: "developer",
+      title: "Developer",
       description:
-        "Access advanced research tools, databases, and collaboration features",
-      icon: "🔬",
+        "Access advanced research tools, databases, and collaboration features for your projects",
       features: [
         "Research Database",
         "Citation Tools",
@@ -121,75 +129,83 @@ export default function RoleModal() {
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-black/80 to-gray-900/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-md text-white rounded-md border border-gray-700/50 max-w-4xl w-full">
+      <div className="bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-md text-white rounded-lg border border-gray-700/50 max-w-5xl w-full shadow-2xl">
         {/* Header */}
-        <div className="text-center p-8 pb-6">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Choose Your{" "}
+        <div className="text-center p-10 pb-8 border-b border-gray-700/30">
+          <h2
+            className={`${roboto.className} text-5xl md:text-6xl font-bold mb-4`}
+          >
+            Select Your{" "}
             <span className="bg-gradient-to-r from-purple-300 to-purple-700 bg-clip-text text-transparent">
               Role
             </span>
           </h2>
-          <p className="text-gray-400 text-lg">
-            Welcome, {session?.user?.name}! Select your role to customize your
-            SleuthInk experience
+          <p className={`${dmSans.className} text-gray-400 text-lg`}>
+            Welcome,{" "}
+            <span className="text-purple-300 font-medium">
+              {session?.user?.name}
+            </span>
+            ! Choose your role to customize your SleuthInk experience
           </p>
         </div>
 
         {/* Role Cards */}
-        <div className="px-8 pb-8">
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <div className="px-10 py-10">
+          <div className="grid md:grid-cols-3 gap-6 mb-10">
             {roles.map((role) => (
               <div
                 key={role.id}
                 className={`
-                  relative bg-gray-800/50 backdrop-blur-sm rounded-md p-6 
-                  border transition-all duration-300 cursor-pointer group
+                  relative bg-gray-800/40 backdrop-blur-sm rounded-lg p-7 
+                  border-2 transition-all duration-300 cursor-pointer group
                   ${
                     selectedRole === role.id
-                      ? "border-purple-500 bg-purple-900/30 scale-105"
-                      : "border-gray-600 hover:border-purple-400 hover:bg-gray-700/50"
+                      ? "border-purple-500 bg-purple-900/20 shadow-lg shadow-purple-500/20"
+                      : "border-gray-600/50 hover:border-purple-400/50 hover:bg-gray-700/30"
                   }
                 `}
                 onClick={() => setSelectedRole(role.id)}
               >
-                {/* Role Icon */}
-                <div className="text-4xl mb-4 text-center group-hover:scale-110 transition-transform duration-300">
-                  {role.icon}
-                </div>
-
                 {/* Role Title */}
-                <h3 className="text-xl font-bold text-center mb-3 text-white">
+                <h3
+                  className={`${roboto.className} text-2xl font-bold mb-3 text-white`}
+                >
                   {role.title}
                 </h3>
 
                 {/* Role Description */}
-                <p className="text-gray-400 text-center text-sm mb-4 leading-relaxed">
+                <p
+                  className={`${dmSans.className} text-gray-400 text-sm mb-6 leading-relaxed h-12`}
+                >
                   {role.description}
                 </p>
 
                 {/* Features List */}
-                <div className="space-y-2">
+                <div className="space-y-3 border-t border-gray-700/30 pt-6">
                   {role.features.map((feature, index) => (
-                    <div key={index} className="flex items-center space-x-2">
+                    <div key={index} className="flex items-center space-x-3">
                       <div
-                        className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
                           selectedRole === role.id
-                            ? "bg-purple-400"
+                            ? "bg-purple-400 w-3 h-3"
                             : "bg-gray-500"
                         }`}
                       ></div>
-                      <span className="text-xs text-gray-300">{feature}</span>
+                      <span
+                        className={`${dmSans.className} text-sm text-gray-300 font-medium`}
+                      >
+                        {feature}
+                      </span>
                     </div>
                   ))}
                 </div>
 
                 {/* Selection Indicator */}
                 {selectedRole === role.id && (
-                  <div className="absolute -top-2 -right-2">
-                    <div className="w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center border-2 border-white">
+                  <div className="absolute -top-3 -right-3">
+                    <div className="w-7 h-7 rounded-full bg-purple-500 flex items-center justify-center border-3 border-gray-900 shadow-lg">
                       <svg
-                        className="w-3 h-3 text-white"
+                        className="w-4 h-4 text-white"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -207,16 +223,18 @@ export default function RoleModal() {
           </div>
 
           {/* Continue Button */}
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center pt-4">
             <button
               onClick={handleSelectRole}
               disabled={!selectedRole || isLoading}
               className={`
-                px-12 py-4 rounded-md text-lg font-semibold transition-all duration-300
-                flex items-center justify-center min-w-[200px]
+                ${
+                  dmSans.className
+                } px-14 py-4 rounded-lg text-lg  transition-all duration-300
+                flex items-center justify-center min-w-[240px] shadow-lg
                 ${
                   selectedRole && !isLoading
-                    ? "bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white transform hover:scale-95"
+                    ? "bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white duration-500 transition-colors"
                     : "bg-gray-700 text-gray-400 cursor-not-allowed"
                 }
               `}
@@ -243,7 +261,7 @@ export default function RoleModal() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  Setting up...
+                  Setting up your account...
                 </>
               ) : selectedRole ? (
                 `Continue as ${roles.find((r) => r.id === selectedRole)?.title}`
@@ -252,7 +270,9 @@ export default function RoleModal() {
               )}
             </button>
 
-            <p className="text-xs text-gray-500 mt-4">
+            <p
+              className={`${dmSans.className} text-xs text-gray-500 mt-5 font-medium`}
+            >
               You can change your role later in account settings
             </p>
           </div>

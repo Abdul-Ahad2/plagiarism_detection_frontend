@@ -4,7 +4,7 @@ import { Toaster } from "sonner";
 export default function DashboardLayout({ children }) {
   return (
     <>
-      <Toaster />
+      <Toaster richColors />
       {children}
       <CopywriteFooter />
     </>
