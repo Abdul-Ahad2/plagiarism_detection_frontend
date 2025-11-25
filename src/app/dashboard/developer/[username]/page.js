@@ -56,7 +56,7 @@ export default function DeveloperDashboard() {
     {
       id: 1,
       name: "Production Key",
-      key: "sk_live_51MzXl2A0B1C2D3E4F5G6H7I8J9K0L1M2N3O4P5Q6",
+      key: "sk_live",
       created: "2024-01-01",
       lastUsed: "2024-01-15 14:32",
       requests: 15420,
@@ -65,7 +65,7 @@ export default function DeveloperDashboard() {
     {
       id: 2,
       name: "Development Key",
-      key: "sk_test_2KmNzXl2A0B1C2D3E4F5G6H7I8J9K0L1M2N3O4P5Q",
+      key: "sk_test",
       created: "2024-01-10",
       lastUsed: "2024-01-15 12:15",
       requests: 2340,
@@ -74,7 +74,7 @@ export default function DeveloperDashboard() {
     {
       id: 3,
       name: "Testing Key",
-      key: "sk_test_3KmNzXl2A0B1C2D3E4F5G6H7I8J9K0L1M2N3O4P5Q",
+      key: "sk_test",
       created: "2024-01-05",
       lastUsed: "2024-01-14 08:30",
       requests: 1200,
