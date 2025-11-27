@@ -288,9 +288,10 @@ export default function DeveloperDashboard() {
                   <code className="text-blue-300 font-mono text-sm">
                     curl -X POST https://api.sleuthinc.com/v1/check-plagiarism \
                     <br />
-                    &nbsp;&nbsp;-H "Authorization: Bearer YOUR_API_KEY" \
+                    &nbsp;&nbsp;-H &quot;Authorization: Bearer
+                    YOUR_API_KEY&quot; \
                     <br />
-                    &nbsp;&nbsp;-F "file=@document.pdf"
+                    &nbsp;&nbsp;-F &quot;file=@document.pdf&quot;
                   </code>
                 </div>
                 <p className="text-gray-300">

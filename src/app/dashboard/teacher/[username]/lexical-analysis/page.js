@@ -109,7 +109,7 @@ export default function UploadPage() {
       clearInterval(progressInterval);
       console.error("Lexical upload error:", err?.response || err);
       setError(
-        err?.response?.data?.error ||
+        err?.response?.data?.detail ||
           "Upload failed. Please try again in a moment."
       );
     } finally {
