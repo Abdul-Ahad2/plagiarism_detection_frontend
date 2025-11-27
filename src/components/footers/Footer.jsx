@@ -1,5 +1,5 @@
 import { Berkshire_Swash } from "next/font/google";
-import { DM_Sans } from "next/font/google";
+import { DM_Sans, Playfair } from "next/font/google";
 import Link from "next/link";
 import { BsTwitter, BsLinkedin, BsInstagram } from "react-icons/bs";
 
@@ -13,6 +13,10 @@ const dmSans_lighter = DM_Sans({
   weight: ["300"],
 });
 
+const pf = Playfair({
+  subsets: ["latin"],
+  weight: ["300"],
+});
 export default function Footer() {
   return (
     <>
@@ -31,11 +35,11 @@ export default function Footer() {
             </div>
 
             {/* Empty Column for spacing */}
-            <div className="space-y-4">
+            <div className=" space-y-4">
               <h4 className="text-2xl font-semibold">Our Vision</h4>
-              <p className="text-md leading-relaxed pr-12">
-                Building a world where originality is valued and academic
-                dishonesty is eliminated.
+              <p className={`${pf.className} text-base leading-relaxed pr-12`}>
+                &quot;Building a world where originality is valued and academic
+                dishonesty is eliminated.&quot;
               </p>
             </div>
 
