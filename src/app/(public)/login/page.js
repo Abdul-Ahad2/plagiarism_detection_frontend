@@ -189,14 +189,6 @@ export default function Login() {
             />
 
             <div>
-              <p className="text-right text-sm mr-3 sm:text-base">
-                <Link
-                  href="/forgot-password"
-                  className="text-transparent bg-gradient-to-r bg-clip-text from-purple-200 to-purple-400 border-purple-300 border-b-[1px]"
-                >
-                  Forgot Password?
-                </Link>
-              </p>
               <input
                 name="password"
                 type="password"

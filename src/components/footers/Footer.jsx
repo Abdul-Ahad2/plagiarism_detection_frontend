@@ -16,11 +16,12 @@ const dmSans_lighter = DM_Sans({
 export default function Footer() {
   return (
     <>
-      <div className=" bg-[#E4E4E4]">
+      <div className="bg-[#E4E4E4]">
         <div
-          className={`${dmSans_lighter.className} w-full bg-black text-[#E4E4E4] `}
+          className={`${dmSans_lighter.className} w-full bg-black text-[#E4E4E4]`}
         >
           <div className="max-w-7xl mx-auto px-9 py-16 grid grid-cols-1 md:grid-cols-4 gap-8 text-center md:text-left">
+            {/* Brand Section */}
             <div className="space-y-4">
               <h3 className={`${bs.className} text-4xl mb-4`}>SleuthInk</h3>
               <p className="text-lg">
@@ -29,44 +30,16 @@ export default function Footer() {
               </p>
             </div>
 
+            {/* Empty Column for spacing */}
             <div className="space-y-4">
-              <h4 className="text-2xl font-semibold">Quick Links</h4>
-              <ul className="space-y-2">
-                <li>
-                  <Link
-                    href="/about"
-                    className="hover:text-[#F8D56B] transition"
-                  >
-                    About Us
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/features"
-                    className="hover:text-[#F8D56B] transition"
-                  >
-                    Features
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/pricing"
-                    className="hover:text-[#F8D56B] transition"
-                  >
-                    Pricing
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/contact"
-                    className="hover:text-[#F8D56B] transition"
-                  >
-                    Contact
-                  </Link>
-                </li>
-              </ul>
+              <h4 className="text-2xl font-semibold">Our Vision</h4>
+              <p className="text-md leading-relaxed pr-12">
+                Building a world where originality is valued and academic
+                dishonesty is eliminated.
+              </p>
             </div>
 
+            {/* Legal Section */}
             <div className="space-y-4">
               <h4 className="text-2xl font-semibold">Legal</h4>
               <ul className="space-y-2">
@@ -97,9 +70,10 @@ export default function Footer() {
               </ul>
             </div>
 
+            {/* Connect Section */}
             <div className="space-y-4">
               <h4 className="text-2xl font-semibold">Connect With Us</h4>
-              <div className="flex justify-start items-center  space-x-4">
+              <div className="flex justify-start items-center space-x-4">
                 <Link href="#" className="hover:text-[#F8D56B] transition">
                   <BsTwitter />
                 </Link>
@@ -115,7 +89,7 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      <div className="bg-[#E4E4E4] pt-0 "></div>
+      <div className="bg-[#E4E4E4] pt-0"></div>
     </>
   );
 }
