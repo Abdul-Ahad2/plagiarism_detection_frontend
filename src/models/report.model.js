@@ -12,6 +12,7 @@ const DocumentSchema = new mongoose.Schema({
   id: { type: Number, required: true },
   name: { type: String, required: true },
   similarity: { type: Number, required: true },
+  aiSimilarity: { type: Number, default: 0 },
   flagged: { type: Boolean, default: false },
   wordCount: { type: Number, required: true },
   matchCount: { type: Number, required: true },
@@ -24,6 +25,7 @@ const SummarySchema = new mongoose.Schema({
   highestSimilarity: { type: Number, required: true },
   averageSimilarity: { type: Number, required: true },
   totalMatches: { type: Number, required: true },
+  averageAiSimilarity: { type: Number, default: 0 },
 });
 
 const ReportSchema = new mongoose.Schema(
@@ -33,6 +35,7 @@ const ReportSchema = new mongoose.Schema(
     submittedBy: { type: String, default: "System" },
     uploadDate: { type: String, required: true }, // stored as YYYY-MM-DD
     similarity: { type: Number, required: true },
+    aiSimilarity: { type: Number, default: 0 },
     status: { type: String, default: "completed" },
     flagged: { type: Boolean, default: false },
     fileCount: { type: Number, required: true },

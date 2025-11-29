@@ -41,6 +41,7 @@ function normalizeReport(api) {
       name: d.name || d.filename || `Document ${idx + 1}`,
       author: d.author || null,
       similarity: pct(d.similarity || 0),
+      aiSimilarity: pct(d.ai_similarity || 0),
       wordCount: d.wordCount || d.word_count || 0,
       flagged: !!d.flagged,
       matches,
@@ -58,6 +59,7 @@ function normalizeReport(api) {
     totalMatches:
       api.summary?.totalMatches ??
       documents.reduce((acc, d) => acc + (d.matches?.length || 0), 0),
+    averageAiSimilarity: pct(api.summary?.averageAiSimilarity ?? 0),
   };
 
   return {
@@ -165,7 +167,7 @@ export default function TeacherSemanticAnalysisReport() {
       return { __html: content };
     }
 
-    // ✅ NEW: Deduplicate matches by text
+    // ✅ Deduplicate matches by text
     const uniqueMatches = {};
     currentDoc.matches.forEach((match) => {
       const key = match.text.toLowerCase().trim();
@@ -178,7 +180,6 @@ export default function TeacherSemanticAnalysisReport() {
     });
 
     const dedupedMatches = Object.values(uniqueMatches);
-    let highlighted = new Set();
 
     dedupedMatches.forEach((match) => {
       if (!match || !match.text) return;
@@ -190,7 +191,6 @@ export default function TeacherSemanticAnalysisReport() {
           ? "bg-orange-500"
           : "bg-yellow-500";
 
-      // ✅ NEW: Only replace FIRST occurrence
       const regex = new RegExp(escapeRegex(match.text), "i");
       content = content.replace(
         regex,
@@ -202,6 +202,7 @@ export default function TeacherSemanticAnalysisReport() {
 
     return { __html: content };
   };
+
   // Handle click on highlighted text
   useEffect(() => {
     const handleClick = (e) => {
@@ -245,7 +246,9 @@ export default function TeacherSemanticAnalysisReport() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-black to-gray-900 text-gray-300 py-20">
+    <div className="min-h-screen bg-gradient-to-r from-black to-gray-900 text-gray-300 py-20 relative">
+      {/* AI Detection Badge - Top Right Corner */}
+
       <div className="max-w-7xl mt-20 mx-auto px-6">
         <Grid height={178} />
         {/* Header */}
@@ -275,6 +278,14 @@ export default function TeacherSemanticAnalysisReport() {
 
         {/* Summary Stats */}
         <div className="grid md:grid-cols-4 gap-3 my-28 px-80">
+          <div className="bg-gray-800/50 rounded-md p-4 py-[28px] border border-blue-500 text-center">
+            <div
+              className={`${dmSans.className} text-3xl font-bold text-white`}
+            >
+              {currentDoc?.aiSimilarity}%
+            </div>
+            <span className="text-gray-400 text-sm">AI Similarity</span>
+          </div>
           <div className="bg-gray-800/50 rounded-md p-4 py-[28px] border border-gray-700/50 text-center">
             <div
               className={`${dmSans.className} text-3xl font-bold text-white`}
@@ -291,19 +302,15 @@ export default function TeacherSemanticAnalysisReport() {
             </div>
             <span className="text-gray-400 text-sm">Total Matches</span>
           </div>
+
           <div className="bg-gray-800/50 rounded-md p-4 py-[28px] border border-gray-700/50 text-center">
             <div
               className={`${dmSans.className} text-3xl font-bold text-white`}
             >
-              {analysisData.summary.highestSimilarity}%
-            </div>
-            <span className="text-gray-400 text-sm">Highest</span>
-          </div>
-          <div className="bg-gray-800/50 rounded-md p-4 py-[28px] border border-gray-700/50 text-center">
-            <div
-              className={`${dmSans.className} text-3xl font-bold text-white`}
-            >
-              {analysisData.summary.averageSimilarity}%
+              {(analysisData.summary.averageSimilarity +
+                currentDoc?.aiSimilarity) /
+                2}
+              %
             </div>
             <span className="text-gray-400 text-sm">Average</span>
           </div>
@@ -411,8 +418,7 @@ export default function TeacherSemanticAnalysisReport() {
                         href={selectedMatch.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-400 text-xs hover:underline flex
-                        items-center gap-1"
+                        className="text-blue-400 text-xs hover:underline flex items-center gap-1"
                       >
                         <Eye className="w-3 h-3" /> View source
                       </a>

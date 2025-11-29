@@ -137,19 +137,29 @@ export default function TeacherLexicalAnalysisReport() {
     }
 
     // Use full document content if available, otherwise show matches
-    let content = escapeForHtml(currentDoc.content || "No content available");
+    let content = currentDoc.content || "No content available";
 
     if (!currentDoc.matches || currentDoc.matches.length === 0) {
-      return { __html: content };
+      return { __html: escapeForHtml(content) };
     }
 
-    // Highlight all matches in the content
+    // Highlight all matches in the content BEFORE escaping HTML
     const matches = [...currentDoc.matches].sort(
       (a, b) => b.similarity - a.similarity
     );
 
+    console.log("Total matches to highlight:", matches.length);
+    console.log("Content length:", content.length);
+
+    // Create markers for matches to avoid overlapping replacements
+    const replacements = [];
+
     matches.forEach((match) => {
-      if (!match || !match.text) return;
+      if (!match || !match.text) {
+        console.log("Skipping match - no text:", match);
+        return;
+      }
+      console.log("Looking for:", match.text.substring(0, 50));
 
       const colorClass =
         match.similarity > 85
@@ -159,15 +169,47 @@ export default function TeacherLexicalAnalysisReport() {
           : "bg-yellow-500";
 
       const regex = new RegExp(escapeRegex(match.text), "gi");
-      content = content.replace(
-        regex,
-        `<span class="${colorClass} text-white px-1 cursor-pointer hover:opacity-90 transition" data-id="${escapeForHtml(
-          match.text
-        )}">${escapeForHtml(match.text)}</span>`
-      );
+      let execResult;
+
+      while ((execResult = regex.exec(content)) !== null) {
+        replacements.push({
+          start: execResult.index,
+          end: execResult.index + execResult[0].length,
+          text: execResult[0],
+          colorClass,
+          match,
+        });
+      }
     });
 
-    return { __html: content };
+    // Sort by position and merge overlapping ranges
+    replacements.sort((a, b) => a.start - b.start);
+
+    // Build the final HTML
+    let result = "";
+    let lastIndex = 0;
+
+    replacements.forEach((replacement) => {
+      // Skip if overlapping with previous
+      if (replacement.start < lastIndex) return;
+
+      // Add text before match
+      result += escapeForHtml(content.slice(lastIndex, replacement.start));
+
+      // Add highlighted match
+      result += `<span class="${
+        replacement.colorClass
+      } text-white px-1 cursor-pointer hover:opacity-90 transition" data-id="${escapeForHtml(
+        replacement.text
+      )}">${escapeForHtml(replacement.text)}</span>`;
+
+      lastIndex = replacement.end;
+    });
+
+    // Add remaining text
+    result += escapeForHtml(content.slice(lastIndex));
+
+    return { __html: result };
   };
 
   // Handle click on highlighted text
