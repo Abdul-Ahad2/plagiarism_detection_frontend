@@ -110,11 +110,11 @@ export default function CookiePolicy() {
                 preferences.
               </p>
               <p>
-                It's important to note that cookies themselves cannot harm your
-                device or access files on your computer. However, some cookies
-                may track your online behavior across different websites if you
-                allow it. SleuthInk uses cookies responsibly and in compliance
-                with applicable privacy laws.
+                It&apos;s important to note that cookies themselves cannot harm
+                your device or access files on your computer. However, some
+                cookies may track your online behavior across different websites
+                if you allow it. SleuthInk uses cookies responsibly and in
+                compliance with applicable privacy laws.
               </p>
             </div>
           </section>
