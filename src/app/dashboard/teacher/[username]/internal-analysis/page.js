@@ -98,7 +98,7 @@ export default function UploadPage() {
 
   return (
     <>
-      <title>Upload Documents - SleuthInk</title>
+      <title>Upload Documents - Internal Analysis</title>
       <div className="h-auto bg-gradient-to-r from-black to-gray-900 text-gray-300 py-44">
         <Grid height={135} />
         <div className="max-w-4xl mx-auto">

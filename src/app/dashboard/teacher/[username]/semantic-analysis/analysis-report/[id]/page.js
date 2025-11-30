@@ -248,7 +248,7 @@ export default function TeacherSemanticAnalysisReport() {
   return (
     <div className="min-h-screen bg-gradient-to-r from-black to-gray-900 text-gray-300 py-20 relative">
       {/* AI Detection Badge - Top Right Corner */}
-
+      <title>Document Report - SleuthInk</title>
       <div className="max-w-7xl mt-20 mx-auto px-6">
         <Grid height={178} />
         {/* Header */}

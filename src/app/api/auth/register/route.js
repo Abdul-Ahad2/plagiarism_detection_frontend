@@ -7,7 +7,21 @@ import User from "@/models/user.model";
 import settingsModel from "@/models/settings.model";
 
 const signupSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters long."),
+  username: z
+    .string()
+    .min(
+      4,
+      "Username must be at least 4 characters long. Make sure it's your full name."
+    )
+    .regex(/^[a-zA-Z\s]+$/, "Username can only contain letters and spaces.")
+    .transform((val) =>
+      val
+        .split(/\s+/) // Split by spaces
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+        .join(" ")
+    ),
   email: z.string().email("Please enter a valid email address."),
   role: z.enum(["student", "teacher", "developer"]),
   password: z

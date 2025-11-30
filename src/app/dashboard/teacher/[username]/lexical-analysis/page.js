@@ -122,6 +122,7 @@ export default function UploadPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-black to-gray-900 text-gray-300 pt-48 py-20 px-4">
+      <title>Upload Documents - Lexical Analysis</title>
       <Grid height={140} />
       <div className="max-w-4xl mx-auto">
         <h1 className="text-6xl md:text-8xl font-bold mb-6 text-center">

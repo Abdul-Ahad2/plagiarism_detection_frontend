@@ -328,6 +328,7 @@ export default function TeacherSettingsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-black to-gray-900 text-gray-300">
+      <title>Settings - Sluethink</title>
       <Grid height={110} />
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-12">
         {/* HEADER */}

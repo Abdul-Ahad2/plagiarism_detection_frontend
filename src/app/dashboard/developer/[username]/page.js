@@ -377,7 +377,7 @@ export default function DeveloperDashboard() {
 
   return (
     <div className="bg-gradient-to-r from-black to-gray-900 text-gray-300 min-h-screen">
-      {/* API Key Creation Modal */}
+      <title>Developer Console - Sluethink</title>
       {showKeyModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-gray-800  border border-gray-700 max-w-md w-full p-6">

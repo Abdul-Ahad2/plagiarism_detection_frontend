@@ -22,6 +22,7 @@ export default function TermsOfService() {
   };
   return (
     <div className="min-h-screen bg-gradient-to-r from-black to-gray-900">
+      <title>Terms of Service - SleuthInk</title>
       <button
         onClick={handleGoBack}
         className="fixed top-20 left-3 z-50 bg-gradient-to-r from-purple-900 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white rounded-full p-4 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-110 flex items-center justify-center cursor-pointer"

@@ -269,7 +269,7 @@ export default function TeacherDashboard() {
   return (
     <div className=" bg-gradient-to-r from-black to-gray-900 text-gray-300">
       <Grid height={170} />
-
+      <title>Dashboard - SleuthInk</title>
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-12">
         {/* Header */}
         <div className="mb-12 mt-24">

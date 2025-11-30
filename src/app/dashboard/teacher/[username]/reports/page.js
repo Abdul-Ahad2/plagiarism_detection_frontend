@@ -295,6 +295,7 @@ export default function TeacherReportsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-black to-gray-900 text-gray-200 py-32 px-4 md:px-8">
+      <title>All Reports - Sluethink</title>
       <Grid />
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
