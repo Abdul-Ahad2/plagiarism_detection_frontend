@@ -1,7 +1,18 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { Loader2, Plus, X, Copy, CheckCircle2, Code, Zap, Shield } from "lucide-react";
+import {
+  Loader2,
+  Plus,
+  X,
+  Copy,
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  Code,
+  Zap,
+  Shield,
+} from "lucide-react";
 
 export default function DeveloperDashboard() {
   const { data: session, status } = useSession();
@@ -14,6 +25,159 @@ export default function DeveloperDashboard() {
   const [showKeyModal, setShowKeyModal] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
   const [copiedKey, setCopiedKey] = useState(null);
+  const [expandedEndpoint, setExpandedEndpoint] = useState(null);
+
+  const endpoints = [
+    {
+      id: "lexical",
+      method: "POST",
+      path: "/api/v1/developer/lexical-analysis",
+      title: "Lexical Analysis",
+      description:
+        "Check documents against web sources and databases for plagiarism using semantic matching",
+      requestBody: `file: [Binary file data] (PDF, DOC, DOCX)`,
+      response: {
+        id: "692b7d29945639b18a759783",
+        name: "Teacher Lexical Analysis",
+        status: "completed",
+        processingTime: "0m 27s",
+        uploadDate: "2025-11-29T23:09:29.266274",
+        analysisType: "lexical",
+        documents: [
+          {
+            id: 1,
+            name: "Andrew Wyke.docx",
+            author: null,
+            similarity: 100,
+            ai_similarity: 0.862,
+            flagged: true,
+            wordCount: 288,
+            matches: [
+              {
+                matched_text:
+                  "Over the past few months, we've continued adding new features and updates to WhatsApp.",
+                similarity: 100,
+                context: "Potential plagiarism detected",
+                source_type: "web",
+                source_url:
+                  "https://www.mirror.co.uk/tech/whatsapp-free-update",
+                source_title: "Mirror - WhatsApp Update",
+              },
+            ],
+          },
+        ],
+        summary: {
+          totalDocuments: 1,
+          flaggedDocuments: 1,
+          highestSimilarity: 100,
+          averageSimilarity: 100,
+        },
+      },
+    },
+    {
+      id: "semantic",
+      method: "POST",
+      path: "/api/v1/developer/semantic-analysis",
+      title: "Semantic Analysis",
+      description:
+        "Perform deep semantic analysis on documents to detect conceptually similar content and paraphrasing",
+      requestBody: `files: [Binary file data] (PDF, DOC, DOCX, max 10 files)`,
+      response: {
+        id: "req_semantic_001",
+        name: "Semantic Analysis Batch",
+        status: "completed",
+        processingTime: "0m 45s",
+        uploadDate: "2025-11-29T22:15:10.123456",
+        analysisType: "semantic",
+        documents: [
+          {
+            id: 1,
+            name: "document.docx",
+            author: null,
+            similarity: 85,
+            semantic_score: 0.89,
+            flagged: true,
+            wordCount: 450,
+            matches: [
+              {
+                matched_text: "The company's revenue increased significantly",
+                similarity: 85,
+                context: "Semantic similarity - potential paraphrasing",
+                source_type: "web",
+                source_url: "https://example.com/article",
+                source_title: "Business Report",
+              },
+            ],
+          },
+        ],
+        summary: {
+          totalDocuments: 1,
+          flaggedDocuments: 1,
+          highestSimilarity: 85,
+          averageSimilarity: 85,
+          semanticOverallScore: 0.89,
+        },
+      },
+    },
+    {
+      id: "internal",
+      method: "POST",
+      path: "/api/v1/developer/internal-analysis",
+      title: "Internal Analysis",
+      description:
+        "Compare multiple documents against each other to detect internal plagiarism and duplication",
+      requestBody: `files: [Binary file data] (PDF, DOC, DOCX, max 10 files)`,
+      response: {
+        id: "69241025aa2e2957ee9a33c8",
+        name: "Internal Plagiarism Check",
+        status: "completed",
+        processingTime: "0m 04s",
+        uploadDate: "2025-11-24T07:58:29.306155",
+        analysisType: "internal",
+        documents: [
+          {
+            id: 1,
+            name: "A_simple.docx",
+            author: null,
+          },
+          {
+            id: 2,
+            name: "B_same_as_A.docx",
+            author: null,
+          },
+        ],
+        comparisons: [
+          {
+            id: "1-2",
+            docA: "A_simple.docx",
+            docB: "B_same_as_A.docx",
+            similarity: 100,
+            flagged: true,
+            overlaps: [
+              {
+                fromDoc: "A_simple.docx",
+                toDoc: "B_same_as_A.docx",
+                text: "As part of the requirements for the Degree of Masters of Science...",
+                similarity: 100,
+                context: "Exact/near-exact sentence overlap",
+              },
+            ],
+          },
+        ],
+        summary: {
+          totalDocuments: 2,
+          totalComparisons: 1,
+          flaggedComparisons: 1,
+          highestSimilarity: 100,
+          averageSimilarity: 100,
+        },
+      },
+    },
+  ];
+
+  const toggleEndpoint = (id) => {
+    setExpandedEndpoint(expandedEndpoint === id ? null : id);
+  };
 
   useEffect(() => {
     if (status === "authenticated" && session?.user?.role === "developer") {
@@ -60,7 +224,7 @@ export default function DeveloperDashboard() {
 
     try {
       setCreatingKey(true);
-      
+
       const response = await fetch("/api/v1/developer/api-keys", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -77,7 +241,11 @@ export default function DeveloperDashboard() {
         setCopiedKey(data.apiKey.key);
         setTimeout(() => setCopiedKey(null), 5000);
       } else {
-        alert(`Error: ${data.error}${data.details ? '\nDetails: ' + data.details : ''}`);
+        alert(
+          `Error: ${data.error}${
+            data.details ? "\nDetails: " + data.details : ""
+          }`
+        );
       }
     } catch (error) {
       console.error("Error creating API key:", error);
@@ -94,7 +262,7 @@ export default function DeveloperDashboard() {
   };
 
   const StatCard = ({ title, value, subtitle }) => (
-    <div className="h-50 flex items-center justify-center bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 border border-gray-700/50 hover:border-blue-500/50 transition-all duration-300">
+    <div className="h-50 flex items-center justify-center bg-gray-800/50 backdrop-blur-sm  p-6 border border-gray-700/50 hover:border-blue-500/50 transition-all duration-300">
       <div>
         <p className="text-gray-500 text-sm mb-2">{title}</p>
         <h3 className="text-4xl font-bold text-white">{value}</h3>
@@ -104,12 +272,12 @@ export default function DeveloperDashboard() {
   );
 
   const RequestRow = ({ req }) => (
-    <div className="bg-gray-800/30 backdrop-blur-sm rounded-lg p-4 border border-gray-700/30 hover:border-blue-500/50 transition-all duration-300">
+    <div className="bg-gray-800/30 backdrop-blur-sm  p-4 border border-gray-700/30 hover:border-blue-500/50 transition-all duration-300">
       <div className="flex items-center justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
             <span
-              className={`px-2 py-1 rounded text-xs font-bold ${
+              className={`px-2 py-1  text-xs font-bold ${
                 req.method === "POST"
                   ? "bg-green-600/30 text-green-300"
                   : req.method === "GET"
@@ -147,7 +315,7 @@ export default function DeveloperDashboard() {
   );
 
   const ApiKeyCard = ({ apiKey }) => (
-    <div className="bg-gray-800/30 backdrop-blur-sm rounded-lg p-4 border border-gray-700/30 hover:border-blue-500/50 transition-all duration-300">
+    <div className="bg-gray-800/30 backdrop-blur-sm  p-4 border border-gray-700/30 hover:border-blue-500/50 transition-all duration-300">
       <div className="flex items-start justify-between mb-3">
         <div>
           <h3 className="text-white font-semibold">{apiKey.name}</h3>
@@ -166,11 +334,13 @@ export default function DeveloperDashboard() {
         </span>
       </div>
 
-      <div className="bg-gray-900/50 rounded p-2 border border-gray-700/50 mb-3 flex items-center justify-between">
-        <p className="text-gray-300 font-mono text-xs truncate flex-1">{apiKey.key}</p>
+      <div className="bg-gray-900/50  p-2 border border-gray-700/50 mb-3 flex items-center justify-between">
+        <p className="text-gray-300 font-mono text-xs truncate flex-1">
+          {apiKey.key}
+        </p>
         <button
           onClick={() => copyToClipboard(apiKey.key)}
-          className="ml-2 p-1 hover:bg-gray-700/50 rounded transition-colors"
+          className="ml-2 p-1 hover:bg-gray-700/50  transition-colors"
           title="Copy to clipboard"
         >
           {copiedKey === apiKey.key ? (
@@ -210,9 +380,11 @@ export default function DeveloperDashboard() {
       {/* API Key Creation Modal */}
       {showKeyModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-800 rounded-lg border border-gray-700 max-w-md w-full p-6">
+          <div className="bg-gray-800  border border-gray-700 max-w-md w-full p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-white">Create New API Key</h3>
+              <h3 className="text-xl font-bold text-white">
+                Create New API Key
+              </h3>
               <button
                 onClick={() => {
                   setShowKeyModal(false);
@@ -233,7 +405,7 @@ export default function DeveloperDashboard() {
                 value={newKeyName}
                 onChange={(e) => setNewKeyName(e.target.value)}
                 placeholder="e.g., Production Key, Test Key"
-                className="w-full p-3 bg-gray-700/50 border border-gray-600 rounded-md text-white focus:border-blue-500 focus:outline-none placeholder-gray-400"
+                className="w-full p-3 bg-gray-700/50 border border-gray-600  text-white focus:border-blue-500 focus:outline-none placeholder-gray-400"
                 onKeyPress={(e) => {
                   if (e.key === "Enter" && !creatingKey) {
                     handleCreateApiKey();
@@ -251,14 +423,14 @@ export default function DeveloperDashboard() {
                   setShowKeyModal(false);
                   setNewKeyName("");
                 }}
-                className="flex-1 px-4 py-2 bg-gray-700/50 hover:bg-gray-600/50 text-white rounded-md transition-colors"
+                className="flex-1 px-4 py-2 bg-gray-700/50 hover:bg-gray-600/50 text-white  transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleCreateApiKey}
                 disabled={creatingKey || !newKeyName.trim()}
-                className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white  transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {creatingKey ? (
                   <>
@@ -283,7 +455,8 @@ export default function DeveloperDashboard() {
             </span>
           </h1>
           <p className="text-xl text-gray-400">
-            Integrate SleuthInc's plagiarism detection API into your applications
+            Integrate SleuthInc's plagiarism detection API into your
+            applications
           </p>
         </div>
 
@@ -307,41 +480,8 @@ export default function DeveloperDashboard() {
         {/* Overview Tab */}
         {activeTab === "overview" && (
           <>
-            {/* What Developers Get */}
-            <div className="mb-12 grid md:grid-cols-3 gap-6">
-              <div className="bg-gray-800/30 backdrop-blur-sm rounded-lg p-6 border border-gray-700/30">
-                <div className="bg-blue-600/20 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-                  <Code className="w-6 h-6 text-blue-400" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">RESTful API</h3>
-                <p className="text-gray-400 text-sm">
-                  Easy-to-use REST API with comprehensive documentation. Submit documents and receive detailed plagiarism reports programmatically.
-                </p>
-              </div>
-
-              <div className="bg-gray-800/30 backdrop-blur-sm rounded-lg p-6 border border-gray-700/30">
-                <div className="bg-green-600/20 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-                  <Zap className="w-6 h-6 text-green-400" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">Fast Processing</h3>
-                <p className="text-gray-400 text-sm">
-                  Powered by advanced AI algorithms. Get plagiarism results in seconds with high accuracy and detailed source matching.
-                </p>
-              </div>
-
-              <div className="bg-gray-800/30 backdrop-blur-sm rounded-lg p-6 border border-gray-700/30">
-                <div className="bg-purple-600/20 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-                  <Shield className="w-6 h-6 text-purple-400" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">Secure & Reliable</h3>
-                <p className="text-gray-400 text-sm">
-                  Enterprise-grade security with API key authentication. Your documents are processed securely and never stored permanently.
-                </p>
-              </div>
-            </div>
-
             {stats && (
-              <div className="grid md:grid-cols-2 text-center lg:grid-cols-3 gap-4 mb-12">
+              <div className="grid md:grid-cols-2 text-center lg:grid-cols-3 py-20 px-64 gap-4 mb-12">
                 <StatCard
                   title="Total Requests"
                   value={stats.totalRequests.toLocaleString()}
@@ -383,25 +523,27 @@ export default function DeveloperDashboard() {
             <div className="flex justify-between items-center mb-8">
               <div>
                 <h2 className="text-3xl font-bold text-white">API Keys</h2>
-                <p className="text-gray-400 text-sm mt-1">You can only have one active API key</p>
+                <p className="text-gray-400 text-sm mt-1">
+                  You can only have one active API key
+                </p>
               </div>
               <button
                 onClick={() => setShowKeyModal(true)}
                 disabled={apiKeys.length >= 1}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white  transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Plus className="w-4 h-4" />
                 New Key
               </button>
             </div>
             {apiKeys.length === 0 ? (
-              <div className="bg-gray-800/30 backdrop-blur-sm rounded-lg p-12 border border-gray-700/30 text-center">
+              <div className="bg-gray-800/30 backdrop-blur-sm  p-12 border border-gray-700/30 text-center">
                 <p className="text-gray-400 mb-4">
                   You don't have any API keys yet.
                 </p>
                 <button
                   onClick={() => setShowKeyModal(true)}
-                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white  transition-colors"
                 >
                   Create Your First API Key
                 </button>
@@ -423,15 +565,16 @@ export default function DeveloperDashboard() {
               <h2 className="text-3xl font-bold text-white">Recent Requests</h2>
               <button
                 onClick={fetchDashboardData}
-                className="px-4 py-2 bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 rounded-lg transition-colors"
+                className="px-4 py-2 bg-gray-700/50 hover:bg-gray-600/50 text-gray-300  transition-colors"
               >
                 Refresh
               </button>
             </div>
             {recentRequests.length === 0 ? (
-              <div className="bg-gray-800/30 backdrop-blur-sm rounded-lg p-12 border border-gray-700/30 text-center">
+              <div className="bg-gray-800/30 backdrop-blur-sm  p-12 border border-gray-700/30 text-center">
                 <p className="text-gray-400">
-                  No API requests yet. Start using your API keys to see requests here.
+                  No API requests yet. Start using your API keys to see requests
+                  here.
                 </p>
               </div>
             ) : (
@@ -446,23 +589,35 @@ export default function DeveloperDashboard() {
 
         {/* Documentation Tab */}
         {activeTab === "documentation" && (
-          <div>
-            <h2 className="text-3xl font-bold text-white mb-8">
-              API Documentation
-            </h2>
+          <div className="min-h-screen bg-transparent">
+            <div className="max-w-6xl mx-auto space-y-8">
+              {/* Header */}
+              <div>
+                <h1 className="text-4xl font-bold text-white mb-2">
+                  API Documentation
+                </h1>
+                <p className="text-gray-400">
+                  Complete reference for SleuthinC plagiarism detection
+                  endpoints
+                </p>
+              </div>
 
-            {/* Quick Start */}
-            <div className="space-y-6">
-              <div className="bg-gray-800/30 backdrop-blur-sm rounded-lg p-8 border border-gray-700/30">
+              {/* Quick Start */}
+              <div className="bg-gray-800/30 backdrop-blur-sm p-8 border border-gray-700/30 ">
                 <h3 className="text-xl font-bold text-white mb-4">
                   Getting Started
                 </h3>
                 <p className="text-gray-300 mb-4">
-                  Start by generating an API key above, then use it in your requests. All API requests must include your API key in the Authorization header.
+                  Start by generating an API key above, then use it in your
+                  requests. All API requests must include your API key in the
+                  Authorization header.
                 </p>
-                <div className="bg-gray-900/50 rounded p-4 mb-4 border border-gray-700/50 overflow-x-auto">
+                <div className="bg-gray-900/50  p-4 border border-gray-700/50 overflow-x-auto">
                   <code className="text-blue-300 font-mono text-sm">
-                    curl -X POST https://api.sleuthinc.com/v1/check-plagiarism \<br />
+                    curl -X POST
+                    https://plagiarism-detection-frontend.vercel.app/api/v1/developer/lexical-analysis
+                    \
+                    <br />
                     &nbsp;&nbsp;-H "Authorization: Bearer YOUR_API_KEY" \<br />
                     &nbsp;&nbsp;-F "file=@document.pdf"
                   </code>
@@ -470,20 +625,25 @@ export default function DeveloperDashboard() {
               </div>
 
               {/* Base URL */}
-              <div className="bg-gray-800/30 backdrop-blur-sm rounded-lg p-8 border border-gray-700/30">
+              <div className="bg-gray-800/30 backdrop-blur-sm p-8 border border-gray-700/30 ">
                 <h3 className="text-xl font-bold text-white mb-4">Base URL</h3>
-                <div className="bg-gray-900/50 rounded p-4 border border-gray-700/50">
-                  <code className="text-blue-300 font-mono">https://api.sleuthinc.com/v1</code>
+                <div className="bg-gray-900/50  p-4 border border-gray-700/50">
+                  <code className="text-blue-300 font-mono">
+                    https://plagiarism-detection-frontend.vercel.app/
+                  </code>
                 </div>
               </div>
 
               {/* Authentication */}
-              <div className="bg-gray-800/30 backdrop-blur-sm rounded-lg p-8 border border-gray-700/30">
-                <h3 className="text-xl font-bold text-white mb-4">Authentication</h3>
+              <div className="bg-gray-800/30 backdrop-blur-sm p-8 border border-gray-700/30 ">
+                <h3 className="text-xl font-bold text-white mb-4">
+                  Authentication
+                </h3>
                 <p className="text-gray-300 mb-4">
-                  All API requests require authentication using your API key in the Authorization header:
+                  All API requests require authentication using your API key in
+                  the Authorization header:
                 </p>
-                <div className="bg-gray-900/50 rounded p-4 border border-gray-700/50">
+                <div className="bg-gray-900/50  p-4 border border-gray-700/50">
                   <code className="text-blue-300 font-mono text-sm">
                     Authorization: Bearer sk_live_your_api_key_here
                   </code>
@@ -491,132 +651,176 @@ export default function DeveloperDashboard() {
               </div>
 
               {/* Endpoints */}
-              <div className="bg-gray-800/30 backdrop-blur-sm rounded-lg p-8 border border-gray-700/30">
-                <h3 className="text-xl font-bold text-white mb-6">API Endpoints</h3>
-                
-                {/* Check Plagiarism */}
-                <div className="mb-6 pb-6 border-b border-gray-700/50">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="px-2 py-1 bg-green-600/30 text-green-300 rounded text-xs font-bold">POST</span>
-                    <code className="text-blue-400 font-mono">/api/v1/developer/check-plagiarism</code>
-                  </div>
-                  <p className="text-gray-300 text-sm mb-3">
-                    Check a single document for plagiarism
-                  </p>
-                  <div className="bg-gray-900/50 rounded p-4 border border-gray-700/50 mb-3">
-                    <p className="text-gray-400 text-xs mb-2">Request Body:</p>
-                    <code className="text-blue-300 font-mono text-sm">
-                      file: [Binary file data] (PDF, DOC, DOCX)
-                    </code>
-                  </div>
-                  <div className="bg-gray-900/50 rounded p-4 border border-gray-700/50">
-                    <p className="text-gray-400 text-xs mb-2">Response:</p>
-                    <pre className="text-green-300 font-mono text-xs overflow-x-auto">
-{`{
-  "request_id": "req_abc123",
-  "status": "processing",
-  "message": "Document uploaded successfully"
-}`}
-                    </pre>
-                  </div>
-                </div>
+              <div className="bg-gray-800/30 backdrop-blur-sm p-8 border border-gray-700/30 ">
+                <h3 className="text-xl font-bold text-white mb-6">
+                  API Endpoints
+                </h3>
+                <div className="space-y-4">
+                  {endpoints.map((endpoint) => (
+                    <div
+                      key={endpoint.id}
+                      className="border border-gray-700/50  overflow-hidden"
+                    >
+                      {/* Endpoint Header */}
+                      <button
+                        onClick={() => toggleEndpoint(endpoint.id)}
+                        className="w-full bg-gray-900/50 hover:bg-gray-900/80 transition-colors p-6 flex items-center justify-between"
+                      >
+                        <div className="flex items-center gap-4 flex-1 text-left">
+                          <span className="px-3 py-1 bg-green-600/30 text-green-300  text-xs font-bold">
+                            {endpoint.method}
+                          </span>
+                          <div>
+                            <code className="text-blue-400 font-mono text-sm block">
+                              {endpoint.path}
+                            </code>
+                            <p className="text-gray-400 text-sm mt-1">
+                              {endpoint.description}
+                            </p>
+                          </div>
+                        </div>
+                        {expandedEndpoint === endpoint.id ? (
+                          <ChevronUp className="w-5 h-5 text-gray-400" />
+                        ) : (
+                          <ChevronDown className="w-5 h-5 text-gray-400" />
+                        )}
+                      </button>
 
-                {/* Get Status */}
-                <div className="mb-6 pb-6 border-b border-gray-700/50">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="px-2 py-1 bg-blue-600/30 text-blue-300 rounded text-xs font-bold">GET</span>
-                    <code className="text-blue-400 font-mono">/api/v1/developer/status/:requestId</code>
-                  </div>
-                  <p className="text-gray-300 text-sm mb-3">
-                    Get the status of a plagiarism check request
-                  </p>
-                  <div className="bg-gray-900/50 rounded p-4 border border-gray-700/50">
-                    <p className="text-gray-400 text-xs mb-2">Response:</p>
-                    <pre className="text-green-300 font-mono text-xs overflow-x-auto">
-{`{
-  "request_id": "req_abc123",
-  "status": "completed",
-  "similarity_score": 23.5,
-  "sources": [
-    {
-      "url": "https://example.com/article",
-      "similarity": 15.2,
-      "title": "Example Article"
-    }
-  ],
-  "word_count": 1250
-}`}
-                    </pre>
-                  </div>
-                </div>
+                      {/* Endpoint Details */}
+                      {expandedEndpoint === endpoint.id && (
+                        <div className="bg-gray-800/20 p-6 border-t border-gray-700/30 space-y-6">
+                          {/* Request */}
+                          <div>
+                            <h4 className="text-white font-semibold mb-3">
+                              Request
+                            </h4>
+                            <div className="bg-gray-900/50  p-4 border border-gray-700/50">
+                              <p className="text-gray-400 text-xs mb-2">
+                                Body:
+                              </p>
+                              <code className="text-blue-300 font-mono text-sm">
+                                {endpoint.requestBody}
+                              </code>
+                            </div>
+                          </div>
 
-                {/* Batch Check */}
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="px-2 py-1 bg-green-600/30 text-green-300 rounded text-xs font-bold">POST</span>
-                    <code className="text-blue-400 font-mono">/api/v1/developer/batch-check</code>
-                  </div>
-                  <p className="text-gray-300 text-sm mb-3">
-                    Check multiple documents in one request
-                  </p>
-                  <div className="bg-gray-900/50 rounded p-4 border border-gray-700/50 mb-3">
-                    <p className="text-gray-400 text-xs mb-2">Request Body:</p>
-                    <code className="text-blue-300 font-mono text-sm">
-                      files: [Array of binary file data]
-                    </code>
-                  </div>
-                  <div className="bg-gray-900/50 rounded p-4 border border-gray-700/50">
-                    <p className="text-gray-400 text-xs mb-2">Response:</p>
-                    <pre className="text-green-300 font-mono text-xs overflow-x-auto">
-{`{
-  "batch_id": "batch_xyz789",
-  "request_ids": ["req_abc123", "req_def456"],
-  "status": "processing"
-}`}
-                    </pre>
-                  </div>
+                          {/* Response */}
+                          <div>
+                            <h4 className="text-white font-semibold mb-3">
+                              Response
+                            </h4>
+                            <div className="bg-gray-900/50  p-4 border border-gray-700/50 overflow-x-auto">
+                              <pre className="text-green-300 font-mono text-xs whitespace-pre-wrap break-words">
+                                {JSON.stringify(endpoint.response, null, 2)}
+                              </pre>
+                            </div>
+                          </div>
+
+                          {/* Details */}
+                          <div>
+                            <h4 className="text-white font-semibold mb-3">
+                              Details
+                            </h4>
+                            <div className="space-y-2 text-sm text-gray-300">
+                              <p>
+                                <span className="text-gray-400">
+                                  • Supported formats:
+                                </span>{" "}
+                                PDF, DOC, DOCX, TXT
+                              </p>
+                              <p>
+                                <span className="text-gray-400">
+                                  • Max file size:
+                                </span>{" "}
+                                500 words per document
+                              </p>
+                              <p>
+                                <span className="text-gray-400">
+                                  • Max files:
+                                </span>{" "}
+                                {endpoint.id === "lexical" ? "1" : "10"} per
+                                request
+                              </p>
+                              <p>
+                                <span className="text-gray-400">
+                                  • Processing timeout:
+                                </span>{" "}
+                                5 minutes
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Error Responses */}
+              <div className="bg-gray-800/30 backdrop-blur-sm p-8 border border-gray-700/30 ">
+                <h3 className="text-xl font-bold text-white mb-6">
+                  Error Responses
+                </h3>
+                <div className="space-y-4">
+                  {[
+                    {
+                      code: 401,
+                      title: "Unauthorized",
+                      message: "Invalid or expired API key",
+                    },
+                    {
+                      code: 400,
+                      title: "Bad Request",
+                      message: "No files provided or invalid format",
+                    },
+                    {
+                      code: 502,
+                      title: "Bad Gateway",
+                      message: "Failed to connect to analysis service",
+                    },
+                    {
+                      code: 500,
+                      title: "Internal Server Error",
+                      message: "Processing error occurred",
+                    },
+                  ].map((error) => (
+                    <div
+                      key={error.code}
+                      className="bg-gray-900/50  p-4 border border-gray-700/50"
+                    >
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="px-2 py-1 bg-red-600/30 text-red-300  text-xs font-bold">
+                          {error.code}
+                        </span>
+                        <span className="text-white font-semibold">
+                          {error.title}
+                        </span>
+                      </div>
+                      <code className="text-blue-300 font-mono text-sm block">
+                        {`{ "error": "${error.message}" }`}
+                      </code>
+                    </div>
+                  ))}
                 </div>
               </div>
 
               {/* Rate Limits */}
-              <div className="bg-gray-800/30 backdrop-blur-sm rounded-lg p-8 border border-gray-700/30">
-                <h3 className="text-xl font-bold text-white mb-4">Rate Limits</h3>
-                <ul className="space-y-2 text-gray-300">
-                  <li className="flex items-start gap-2">
-                    <span className="text-blue-400 mt-1">•</span>
-                    <span>100 requests per hour per API key</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-blue-400 mt-1">•</span>
-                    <span>Maximum file size: 10MB per document</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-blue-400 mt-1">•</span>
-                    <span>Supported formats: PDF, DOC, DOCX, TXT</span>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Error Codes */}
-              <div className="bg-gray-800/30 backdrop-blur-sm rounded-lg p-8 border border-gray-700/30">
-                <h3 className="text-xl font-bold text-white mb-4">Error Codes</h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <code className="text-red-400 font-mono">400</code>
-                    <span className="text-gray-300">Bad Request - Invalid parameters</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <code className="text-red-400 font-mono">401</code>
-                    <span className="text-gray-300">Unauthorized - Invalid API key</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <code className="text-red-400 font-mono">429</code>
-                    <span className="text-gray-300">Too Many Requests - Rate limit exceeded</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <code className="text-red-400 font-mono">500</code>
-                    <span className="text-gray-300">Internal Server Error</span>
-                  </div>
+              <div className="bg-gray-800/30 backdrop-blur-sm p-8 border border-gray-700/30 ">
+                <h3 className="text-xl font-bold text-white mb-4">
+                  Rate Limits & Quotas
+                </h3>
+                <div className="space-y-2 text-gray-300">
+                  <p>• Maximum file size: 500 words per document</p>
+                  <p>
+                    • Maximum files per request: 1 (lexical) or 10
+                    (semantic/internal)
+                  </p>
+                  <p>• Processing timeout: 3-4 minutes</p>
+                  <p>
+                    • API calls are logged and tracked against your account
+                    quota
+                  </p>
+                  <p>• Check your dashboard for current usage statistics</p>
                 </div>
               </div>
             </div>
